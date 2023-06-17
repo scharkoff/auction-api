@@ -8,6 +8,9 @@ from .authControllerInterface import IAuthController
 class AuthController(IAuthController):
     authService = AuthService()
 
+    def __init__(self) -> None:
+       pass
+
     @staticmethod
     @csrf_exempt
     @api_view(['POST'])

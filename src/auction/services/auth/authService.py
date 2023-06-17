@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
-from auction.models.user import UserSerializer
+from auction.serializers.user import UserSerializer
 from rest_framework import serializers
 from .authServiceInterface import IAuthService
 
