@@ -1,5 +1,5 @@
 from django.urls import path
-from auction.controllers.authController import AuthController
+from auction.controllers.auth.authController import AuthController
 
 urlpatterns = [
     path('auth/login/', AuthController.login, name='login'),

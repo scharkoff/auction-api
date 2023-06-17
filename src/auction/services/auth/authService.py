@@ -1,8 +1,9 @@
 from django.contrib.auth import authenticate, login, logout
 from auction.models.user import UserSerializer
 from rest_framework import serializers
+from .authServiceInterface import IAuthService
 
-class AuthService:
+class AuthService(IAuthService):
     def register(self, username, password, email):
         try:
             serializer = UserSerializer(data={'username': username, 'password': password, 'email': email})
