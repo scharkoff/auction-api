@@ -1,6 +1,5 @@
 from rest_framework import status
 from rest_framework.response import Response
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from auction.services.auction.auctionService import AuctionService
 from .auctionControllerInterface import IAuctionController
@@ -13,11 +12,13 @@ class AuctionController(IAuctionController):
        pass
 
     @staticmethod
-    @csrf_exempt
     @permission_classes([IsAuthenticated])
     @api_view(['POST'])
     def create(request):
         try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+             
             title = request.data.get('title')
             startTime = request.data.get('startTime')
             endTime = request.data.get('endTime')
@@ -28,12 +29,14 @@ class AuctionController(IAuctionController):
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
-    @staticmethod
-    @csrf_exempt  
+    @staticmethod  
     @permission_classes([IsAuthenticated])
     @api_view(['PATCH'])  
     def update(request):
         try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
             auctionId = request.data.get('auctionId')
             title = request.data.get('title')
             startTime = request.data.get('startTime')
@@ -46,11 +49,13 @@ class AuctionController(IAuctionController):
             return Response({'message': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
         
     @staticmethod
-    @csrf_exempt
     @permission_classes([IsAuthenticated])
     @api_view(['POST'])
     def close(request):
         try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
             auctionId = request.data.get('auctionId')
 
             response = AuctionController.auctionService.close(auctionId)
@@ -59,11 +64,13 @@ class AuctionController(IAuctionController):
             return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     @staticmethod
-    @csrf_exempt
     @permission_classes([IsAuthenticated])
     @api_view(['POST'])
     def get(request):
         try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
             auctionId = request.data.get('auctionId')
 
             response = AuctionController.auctionService.get(auctionId)
@@ -72,10 +79,12 @@ class AuctionController(IAuctionController):
             return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     @staticmethod
-    @csrf_exempt
     @api_view(['POST'])
     def search(request):
         try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
             query = request.data.get('query')
 
             response = AuctionController.auctionService.search(query)

@@ -1,6 +1,5 @@
 from rest_framework import status
 from rest_framework.response import Response
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from auction.services.auth.authService import AuthService
 from .authControllerInterface import IAuthController
@@ -12,7 +11,6 @@ class AuthController(IAuthController):
        pass
 
     @staticmethod
-    @csrf_exempt
     @api_view(['POST'])
     def register(request):
         try:
@@ -26,8 +24,7 @@ class AuthController(IAuthController):
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
-    @staticmethod
-    @csrf_exempt  
+    @staticmethod  
     @api_view(['POST'])  
     def login(request):
         try:
@@ -41,10 +38,12 @@ class AuthController(IAuthController):
             return Response({'message': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
         
     @staticmethod
-    @csrf_exempt
     @api_view(['POST'])
     def logout(request):
         try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
             response = AuthController.authService.logout(request)
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
