@@ -16,7 +16,7 @@ class AuctionService(IAuctionService):
         serializedAuction = AuctionSerializer(auction).data
         return {'message': 'Аукцион успешно создан', 'data': serializedAuction}
 
-    def update(self, auctionId, title=None, startTime=None, endTime=None, isClosed=False):
+    def update(self, auctionId, title=None, startTime=None, endTime=None):
         try:
             startTime = self.convertMillisecondsToDatetime(startTime)
             endTime = self.convertMillisecondsToDatetime(endTime)
@@ -28,8 +28,6 @@ class AuctionService(IAuctionService):
                 auction.start_time = startTime
             if endTime:
                 auction.end_time = endTime
-            if isClosed:
-                auction.is_closed = isClosed
             auction.save()
             serializedAuction = AuctionSerializer(auction).data
             return {'message': 'Аукцион успешно изменен', 'data': serializedAuction}
