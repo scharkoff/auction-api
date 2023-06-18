@@ -7,11 +7,11 @@ class AuctionService(IAuctionService):
     def __init__(self) -> None:
         pass
 
-    def create(self, title, startTime, endTime):
+    def create(self, title, startTime, endTime, owner):
         startTime = self.convertMillisecondsToDatetime(startTime)
         endTime = self.convertMillisecondsToDatetime(endTime)
     
-        auction = Auction(title=title, start_time=startTime, end_time=endTime)
+        auction = Auction(title=title, start_time=startTime, end_time=endTime, owner=owner)
         auction.save()
         serializedAuction = AuctionSerializer(auction).data
         return {'message': 'Аукцион успешно создан', 'data': serializedAuction}

@@ -4,7 +4,7 @@ from auction.models.auction import Auction
 class AuctionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Auction
-        fields = ['id', 'title', 'start_time', 'end_time', 'is_closed']
+        fields = ['id', 'title', 'start_time', 'end_time', 'is_closed', 'owner']
 
     def validate(self, data):
         start_time = data.get('start_time')

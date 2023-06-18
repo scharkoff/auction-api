@@ -4,6 +4,8 @@ from rest_framework.decorators import api_view, permission_classes
 from auction.services.auction.auctionService import AuctionService
 from .auctionControllerInterface import IAuctionController
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 class AuctionController(IAuctionController):
     auctionService = AuctionService()
@@ -19,11 +21,13 @@ class AuctionController(IAuctionController):
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
              
+            ownerId = request.user.id
+            owner = get_object_or_404(User, id=ownerId)
             title = request.data.get('title')
             startTime = request.data.get('startTime')
             endTime = request.data.get('endTime')
 
-            response = AuctionController.auctionService.create(title, startTime, endTime)
+            response = AuctionController.auctionService.create(title, startTime, endTime, owner)
 
             return Response(response, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -65,7 +69,7 @@ class AuctionController(IAuctionController):
         
     @staticmethod
     @permission_classes([IsAuthenticated])
-    @api_view(['POST'])
+    @api_view(['GET'])
     def get(request):
         try:
             if not request.user.is_authenticated or not request.user.is_active:
