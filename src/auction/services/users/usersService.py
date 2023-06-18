@@ -40,16 +40,20 @@ class UserService(IUsersService):
         except Exception as e:
             raise Exception(str(e))
         
-    def update(self, userId, username=None, password=None, email=None):
+    def update(self, userId, username, password, email):
         try:
             user = User.objects.get(id=userId)
-            if username:
-                user.username = username
-            if password:
-                user.password = password
-            if email:
-                user.email = email
-            user.save()
+
+            user.username = username
+            user.set_password(password)
+            user.email = email
+
+            data = {'username': username, 'password': password, 'email': email}
+            
+            serializer = UserSerializer(instance=user, data=data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
             serializedUser = UserSerializer(user).data
 
             return {'message': 'Данные пользователя успешно изменены', 'data': serializedUser}
@@ -59,6 +63,8 @@ class UserService(IUsersService):
             raise ObjectDoesNotExist('Запрашиваемый пользователь не найден или не существует')
         except Exception as e:
             raise Exception(str(e))
+
+
         
     def delete(self, userId):
         try:

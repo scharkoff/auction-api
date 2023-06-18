@@ -69,6 +69,17 @@ class AuctionService(IAuctionService):
             raise ObjectDoesNotExist('Запрашиваемый аукцион не найден или не существует')
         except Exception as e:
             raise Exception(str(e))
+        
+    def getAll(self):
+        try:
+            auctions = Auction.objects.all()
+            serializedAuctions = AuctionSerializer(auctions, many=True).data
+
+            return {'message': 'Аукцион(ы) успешно найден(ы)', 'data': serializedAuctions}
+        except Auction.DoesNotExist:
+            raise ObjectDoesNotExist('Запрашиваемый аукцион не найден или не существует')
+        except Exception as e:
+            raise Exception(str(e))
 
     def search(self, query):
         try:

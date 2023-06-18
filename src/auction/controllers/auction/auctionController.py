@@ -115,6 +115,22 @@ class AuctionController(IAuctionController):
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @staticmethod
+    @api_view(['GET'])
+    def getAll(request):
+        try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+
+            try:
+                response = AuctionController.auctionService.getAll()
+                return Response(response, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except Exception as e:
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    @staticmethod
     @api_view(['POST'])
     def search(request):
         try:

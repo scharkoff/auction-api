@@ -9,10 +9,10 @@ class UserSerializer(serializers.ModelSerializer):
             message='Неверный формат почты'
         )
     ])
-        
+
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['id', 'username', 'email', 'password']
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
