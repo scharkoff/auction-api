@@ -41,8 +41,9 @@ class AuctionController(IAuctionController):
             title = request.data.get('title')
             startTime = request.data.get('startTime')
             endTime = request.data.get('endTime')
+            isClosed = request.data.get('isClosed')
 
-            response = AuctionController.auctionService.update(auctionId, title, startTime, endTime)
+            response = AuctionController.auctionService.update(auctionId, title, startTime, endTime, isClosed)
 
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
