@@ -80,7 +80,6 @@ REST_FRAMEWORK = {
     ],
 }
 
-AUTH_USER_MODEL = 'auction.models.user.CustomUser'
 
 SESSION_COOKIE_AGE = 1800
 CSRF_USE_SESSIONS = True
