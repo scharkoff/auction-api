@@ -5,7 +5,6 @@ from rest_framework.decorators import api_view
 from auction.services.auction.auctionService import AuctionService
 from .auctionControllerInterface import IAuctionController
 from django.contrib.auth.models import User
-from auction.models.auction import Auction
 from django.shortcuts import get_object_or_404
 
 class AuctionController(IAuctionController):

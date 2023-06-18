@@ -1,9 +1,8 @@
-from rest_framework import status
-from rest_framework.response import Response
 from django.contrib.auth.models import User
 from auction.serializers.user import UserSerializer
 from rest_framework import serializers
 from .usersServiceInterface import IUsersService
+from django.core.exceptions import ObjectDoesNotExist
 
 class UserService(IUsersService):
     def __init__(self) -> None:
@@ -15,15 +14,18 @@ class UserService(IUsersService):
             serializedUsers = UserSerializer(users, many=True).data
             return {'message': 'Пользователи успешно найдены', 'data': serializedUsers}
         except Exception as e:
-            return {'message': str(e)}
+            raise Exception(str(e))
         
     def getById(self, userId):
         try:
             user = User.objects.get(id=userId)
             serializedUser = UserSerializer(user).data
             return {'message': 'Пользователь успешно найден', 'data': serializedUser}
+        
+        except User.DoesNotExist:
+            raise ObjectDoesNotExist('Запрашиваемый пользователь не найден или не существует')
         except Exception as e:
-            return {'message': str(e)}
+            raise Exception(str(e))
         
     def create(self, username, password, email):
         try:
@@ -36,7 +38,7 @@ class UserService(IUsersService):
         except serializers.ValidationError as e:
              return {'message': "Ошибка валидации", 'data': e.detail}
         except Exception as e:
-            return {'message': str(e)}
+            raise Exception(str(e))
         
     def update(self, userId, username=None, password=None, email=None):
         try:
@@ -53,8 +55,10 @@ class UserService(IUsersService):
             return {'message': 'Данные пользователя успешно изменены', 'data': serializedUser}
         except serializers.ValidationError as e:
             return {'message': "Ошибка валидации", 'data': e.detail}
+        except User.DoesNotExist:
+            raise ObjectDoesNotExist('Запрашиваемый пользователь не найден или не существует')
         except Exception as e:
-            return {'message': str(e)}
+            raise Exception(str(e))
         
     def delete(self, userId):
         try:
@@ -62,5 +66,8 @@ class UserService(IUsersService):
             user.delete()
 
             return {'message': 'Пользователь успешно удален'}
+        
+        except User.DoesNotExist:
+            raise ObjectDoesNotExist('Запрашиваемый пользователь не найден или не существует')
         except Exception as e:
-            return {'message': str(e)}
+            raise Exception(str(e))
