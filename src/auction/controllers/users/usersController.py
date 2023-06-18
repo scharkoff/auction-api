@@ -1,8 +1,8 @@
-from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework import status, serializers
 from rest_framework.response import Response
 from auction.services.users.usersService import UserService
 from .usersControllerInterface import IUsersController
+from rest_framework.decorators import api_view
 
 class UsersController(IUsersController):
     usersSerivce = UserService()
@@ -11,9 +11,12 @@ class UsersController(IUsersController):
         pass
     
     @staticmethod
-    @api_view(['POST'])
+    @api_view(['GET'])
     def getAll(request):
         try:
+          if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+          
           response = UsersController.usersSerivce.getAll()
 
           return Response(response, status=status.HTTP_200_OK)
@@ -21,9 +24,12 @@ class UsersController(IUsersController):
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     @staticmethod
-    @api_view(['POST'])
+    @api_view(['GET'])
     def getById(request):
         try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
             userId = request.data.get('userId')
            
             response = UsersController.usersSerivce.getById(userId)
@@ -36,28 +42,45 @@ class UsersController(IUsersController):
     @api_view(['POST'])
     def create(request):
         try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
             username = request.data.get('username')
             password = request.data.get('password')
             email = request.data.get('email')
 
-            response = UsersController.usersSerivce.create(username, password, email)
-
-            return Response(response, status=status.HTTP_200_OK)
+            try:  
+                response = UsersController.usersSerivce.create(username, password, email)
+                return Response(response, status=status.HTTP_200_OK)
+            except serializers.ValidationError as e:
+                return Response({'message': "Ошибка валидации", 'data': e}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
         except Exception as e:
-          return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         
     @staticmethod
     @api_view(['PATCH'])
     def update(request):
         try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
             userId = request.data.get('userId')
             username = request.data.get('username', None)
             password = request.data.get('password', None)
             email = request.data.get('email', None)
 
-            response = UsersController.usersSerivce.update(userId, username, password, email)
-
-            return Response(response, status=status.HTTP_200_OK)
+            try:  
+                response = UsersController.usersSerivce.update(userId, username, password, email)
+                return Response(response, status=status.HTTP_200_OK)
+            except serializers.ValidationError as e:
+                return Response({'message': "Ошибка валидации", 'data': e}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
         except Exception as e:
           return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -65,6 +88,9 @@ class UsersController(IUsersController):
     @api_view(['DELETE'])
     def delete(request):
         try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
             userId = request.data.get('userId')
 
             response = UsersController.usersSerivce.delete(userId)

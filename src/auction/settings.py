@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'auction.middlewares.csrf.CustomCsrfViewMiddleware',
 ]
 
 ROOT_URLCONF = 'auction.urls'
@@ -80,6 +81,7 @@ REST_FRAMEWORK = {
 }
 
 SESSION_COOKIE_AGE = 1800
+CSRF_USE_SESSIONS = True
 
 WSGI_APPLICATION = 'auction.wsgi.application'
 

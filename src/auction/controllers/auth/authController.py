@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from auction.services.auth.authService import AuthService
 from .authControllerInterface import IAuthController
+from rest_framework.exceptions import AuthenticationFailed
 
 class AuthController(IAuthController):
     authService = AuthService()
@@ -18,9 +19,15 @@ class AuthController(IAuthController):
             password = request.data.get('password')
             email = request.data.get('email')
 
-            response = AuthController.authService.register(username, password, email)
+            if not username or not password or not email:
+                raise Exception("Неправильный формат запроса")
 
-            return Response(response, status=status.HTTP_201_CREATED)
+            try:
+                response = AuthController.authService.register(username, password, email)
+                return Response(response, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -31,11 +38,20 @@ class AuthController(IAuthController):
             username = request.data.get('username')
             password = request.data.get('password')
 
-            response = AuthController.authService.login(request, username, password)
+            if not username or not password:
+                raise Exception("Неправильный формат запроса")
 
-            return Response(response, status=status.HTTP_200_OK)
+            try:
+                response = AuthController.authService.login(request, username, password)
+                return Response(response, status=status.HTTP_200_OK)
+            
+            except AuthenticationFailed as e:
+                return Response({'message': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+           
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @staticmethod
     @api_view(['POST'])
@@ -44,7 +60,11 @@ class AuthController(IAuthController):
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
-            response = AuthController.authService.logout(request)
-            return Response(response, status=status.HTTP_200_OK)
+            try:
+                response = AuthController.authService.logout(request)
+                return Response(response, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)

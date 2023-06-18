@@ -9,36 +9,36 @@ class UserService(IUsersService):
     def __init__(self) -> None:
         pass
     
-    def getAll():
+    def getAll(self):
         try:
             users = User.objects.all()
-            serializedUsers = UserSerializer(users, many=True)
+            serializedUsers = UserSerializer(users, many=True).data
             return {'message': 'Пользователи успешно найдены', 'data': serializedUsers}
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return {'message': str(e)}
         
-    def getById(userId):
+    def getById(self, userId):
         try:
             user = User.objects.get(id=userId)
-            serializedUser = UserSerializer(user)
+            serializedUser = UserSerializer(user).data
             return {'message': 'Пользователь успешно найден', 'data': serializedUser}
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return {'message': str(e)}
         
-    def create(username, password, email):
+    def create(self, username, password, email):
         try:
             serializer = UserSerializer(data={'username': username, 'password': password, 'email': email})
             serializer.is_valid(raise_exception=True)
             user = serializer.save()
-            serializedUser = UserSerializer(user)
+            serializedUser = UserSerializer(user).data
 
             return {'message': 'Пользователь успешно создан', 'data': serializedUser}
         except serializers.ValidationError as e:
-            return Response({'message': e.detail}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+             return {'message': "Ошибка валидации", 'data': e.detail}
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return {'message': str(e)}
         
-    def update(userId, username=None, password=None, email=None):
+    def update(self, userId, username=None, password=None, email=None):
         try:
             user = User.objects.get(id=userId)
             if username:
@@ -48,19 +48,19 @@ class UserService(IUsersService):
             if email:
                 user.email = email
             user.save()
-            serializedUser = UserSerializer(user)
+            serializedUser = UserSerializer(user).data
 
             return {'message': 'Данные пользователя успешно изменены', 'data': serializedUser}
         except serializers.ValidationError as e:
-            return Response({'message': e.detail}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return {'message': "Ошибка валидации", 'data': e.detail}
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return {'message': str(e)}
         
-    def delete(userId):
+    def delete(self, userId):
         try:
             user = User.objects.get(id=userId)
             user.delete()
 
             return {'message': 'Пользователь успешно удален'}
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return {'message': str(e)}

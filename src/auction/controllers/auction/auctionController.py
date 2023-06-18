@@ -1,10 +1,11 @@
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework.decorators import api_view
 from auction.services.auction.auctionService import AuctionService
 from .auctionControllerInterface import IAuctionController
-from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
+from auction.models.auction import Auction
 from django.shortcuts import get_object_or_404
 
 class AuctionController(IAuctionController):
@@ -14,7 +15,6 @@ class AuctionController(IAuctionController):
        pass
 
     @staticmethod
-    @permission_classes([IsAuthenticated])
     @api_view(['POST'])
     def create(request):
         try:
@@ -27,14 +27,21 @@ class AuctionController(IAuctionController):
             startTime = request.data.get('startTime')
             endTime = request.data.get('endTime')
 
-            response = AuctionController.auctionService.create(title, startTime, endTime, owner)
+            if not ownerId or not owner or not title or not startTime or not endTime:
+                raise Exception("Неправильный формат запроса")
 
-            return Response(response, status=status.HTTP_201_CREATED)
+            try:
+                response = AuctionController.auctionService.create(title, startTime, endTime, owner)
+                return Response(response, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        except serializers.ValidationError as e:
+            return Response({'message': "Ошибка валидации", 'data': e}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @staticmethod  
-    @permission_classes([IsAuthenticated])
     @api_view(['PATCH'])  
     def update(request):
         try:
@@ -46,14 +53,23 @@ class AuctionController(IAuctionController):
             startTime = request.data.get('startTime')
             endTime = request.data.get('endTime')
 
-            response = AuctionController.auctionService.update(auctionId, title, startTime, endTime)
+            if not auctionId or not title or not startTime or not endTime:
+                raise Exception("Неправильный формат запроса")
 
-            return Response(response, status=status.HTTP_200_OK)
+            try:
+                response = AuctionController.auctionService.update(auctionId, title, startTime, endTime)
+                return Response(response, status=status.HTTP_200_OK)
+            except ObjectDoesNotExist as e:
+                return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except serializers.ValidationError as e:
+            return Response({'message': "Ошибка валидации", 'data': e}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @staticmethod
-    @permission_classes([IsAuthenticated])
     @api_view(['POST'])
     def close(request):
         try:
@@ -62,13 +78,21 @@ class AuctionController(IAuctionController):
             
             auctionId = request.data.get('auctionId')
 
-            response = AuctionController.auctionService.close(auctionId)
-            return Response(response, status=status.HTTP_200_OK)
+            if not auctionId:
+                raise Exception("Неправильный формат запроса")
+
+            try:
+                response = AuctionController.auctionService.close(auctionId)
+                return Response(response, status=status.HTTP_200_OK)
+            except ObjectDoesNotExist as e:
+                return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @staticmethod
-    @permission_classes([IsAuthenticated])
     @api_view(['GET'])
     def getById(request):
         try:
@@ -77,10 +101,19 @@ class AuctionController(IAuctionController):
             
             auctionId = request.data.get('auctionId')
 
-            response = AuctionController.auctionService.getById(auctionId)
-            return Response(response, status=status.HTTP_200_OK)
+            if not auctionId:
+                raise Exception("Неправильный формат запроса")
+
+            try:
+                response = AuctionController.auctionService.getById(auctionId)
+                return Response(response, status=status.HTTP_200_OK)
+            except ObjectDoesNotExist as e:
+                return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @staticmethod
     @api_view(['POST'])
@@ -91,7 +124,16 @@ class AuctionController(IAuctionController):
             
             query = request.data.get('query')
 
-            response = AuctionController.auctionService.search(query)
-            return Response(response, status=status.HTTP_200_OK)
+            if not query:
+                raise Exception("Неправильный формат запроса")
+
+            try:
+                response = AuctionController.auctionService.search(query)
+                return Response(response, status=status.HTTP_200_OK)
+            except ObjectDoesNotExist as e:
+                return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)

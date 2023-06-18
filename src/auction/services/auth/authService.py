@@ -4,6 +4,7 @@ from rest_framework import serializers
 from .authServiceInterface import IAuthService
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
 
 class AuthService(IAuthService):
     def register(self, username, password, email):
@@ -13,28 +14,34 @@ class AuthService(IAuthService):
             user = serializer.save()
 
             serializedUser = UserSerializer(user).data
+
             return {'message': 'Пользователь успешно зарегистрирован', 'data': serializedUser}
         except serializers.ValidationError as e:
             return Response({'message': e.detail}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            raise Exception(str(e))
 
     def login(self, request, username, password):
         try:
             user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                serializedUser = UserSerializer(user).data
-                return {'message': 'Пользователь успешно авторизован', 'data': serializedUser}
-            else:
-                raise Exception('Неправильный логин или пароль')
+
+            if user is None:
+                raise AuthenticationFailed()
+
+            login(request, user)
+            serializedUser = UserSerializer(user).data
+
+            return {'message': 'Пользователь успешно авторизован', 'data': serializedUser}
+        except AuthenticationFailed as e:
+            raise AuthenticationFailed('Неверные учетные данные пользователя')
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            raise Exception(str(e))
 
     def logout(self, request):
         try:
             logout(request)
+
             return {'message': 'Успешный выход из аккаунта'}
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            raise Exception(str(e))
 

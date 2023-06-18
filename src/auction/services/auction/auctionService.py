@@ -1,6 +1,8 @@
 from auction.models.auction import Auction
 from auction.serializers.auction import AuctionSerializer
 from .auctionServiceInterface import IAuctionService
+from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 
 class AuctionService(IAuctionService):
@@ -8,13 +10,19 @@ class AuctionService(IAuctionService):
         pass
 
     def create(self, title, startTime, endTime, owner):
-        startTime = self.convertMillisecondsToDatetime(startTime)
-        endTime = self.convertMillisecondsToDatetime(endTime)
-    
-        auction = Auction(title=title, start_time=startTime, end_time=endTime, owner=owner)
-        auction.save()
-        serializedAuction = AuctionSerializer(auction).data
-        return {'message': 'Аукцион успешно создан', 'data': serializedAuction}
+        try:
+            startTime = self.convertMillisecondsToDatetime(startTime)
+            endTime = self.convertMillisecondsToDatetime(endTime)
+        
+            auction = Auction(title=title, start_time=startTime, end_time=endTime, owner=owner)
+            auction.save()
+            serializedAuction = AuctionSerializer(auction).data
+
+            return {'message': 'Аукцион успешно создан', 'data': serializedAuction}
+        except serializers.ValidationError as e:
+             return {'message': "Ошибка валидации", 'data': e.detail}
+        except Exception as e:
+            raise Exception(str(e))
 
     def update(self, auctionId, title=None, startTime=None, endTime=None):
         try:
@@ -30,9 +38,14 @@ class AuctionService(IAuctionService):
                 auction.end_time = endTime
             auction.save()
             serializedAuction = AuctionSerializer(auction).data
+
             return {'message': 'Аукцион успешно изменен', 'data': serializedAuction}
+        except serializers.ValidationError as e:
+            return {'message': "Ошибка валидации", 'data': e.detail}
         except Auction.DoesNotExist:
-            raise Exception('Запрашиваемый аукцион не найден или не существует')
+            raise ObjectDoesNotExist('Запрашиваемый аукцион не найден или не существует')
+        except Exception as e:
+            raise Exception(str(e))
 
     def close(self, auctionId):
         try:
@@ -42,20 +55,31 @@ class AuctionService(IAuctionService):
             serializedAuction = AuctionSerializer(auction).data
             return {'message': 'Аукцион успешно закрыт', 'data': serializedAuction}
         except Auction.DoesNotExist:
-            raise Exception('Запрашиваемый аукцион не найден или не существует')
+            raise ObjectDoesNotExist('Запрашиваемый аукцион не найден или не существует')
+        except Exception as e:
+            raise Exception(str(e))
 
     def getById(self, auctionId):
         try:
             auction = Auction.objects.get(id=auctionId)
             serializedAuction = AuctionSerializer(auction).data
+
             return {'message': 'Аукцион успешно найден', 'data': serializedAuction}
         except Auction.DoesNotExist:
-            raise Exception('Запрашиваемый аукцион не найден или не существует')
+            raise ObjectDoesNotExist('Запрашиваемый аукцион не найден или не существует')
+        except Exception as e:
+            raise Exception(str(e))
 
     def search(self, query):
-        auctions = Auction.objects.filter(title__icontains=query)
-        serializedAuctions = AuctionSerializer(auctions, many=True).data
-        return {'message': 'Аукцион(ы) успешно найден(ы)', 'data': serializedAuctions}
+        try:
+            auctions = Auction.objects.filter(title__icontains=query)
+            serializedAuctions = AuctionSerializer(auctions, many=True).data
+
+            return {'message': 'Аукцион(ы) успешно найден(ы)', 'data': serializedAuctions}
+        except Auction.DoesNotExist:
+            raise ObjectDoesNotExist('Запрашиваемый аукцион не найден или не существует')
+        except Exception as e:
+            raise Exception(str(e))
 
     def convertMillisecondsToDatetime(self, milliseconds):
         return datetime.fromtimestamp(int(milliseconds) / 1000)
