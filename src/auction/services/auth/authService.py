@@ -2,8 +2,6 @@ from django.contrib.auth import authenticate, login, logout
 from auction.serializers.user import UserSerializer
 from rest_framework import serializers
 from .authServiceInterface import IAuthService
-from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 
 class AuthService(IAuthService):
@@ -17,7 +15,7 @@ class AuthService(IAuthService):
 
             return {'message': 'Пользователь успешно зарегистрирован', 'data': serializedUser}
         except serializers.ValidationError as e:
-            return Response({'message': e.detail}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            raise serializers.ValidationError(e.detail)
         except Exception as e:
             raise Exception(str(e))
 
@@ -29,6 +27,7 @@ class AuthService(IAuthService):
                 raise AuthenticationFailed()
 
             login(request, user)
+            
             serializedUser = UserSerializer(user).data
 
             return {'message': 'Пользователь успешно авторизован', 'data': serializedUser}

@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from auction.services.auth.authService import AuthService
@@ -25,6 +25,8 @@ class AuthController(IAuthController):
             try:
                 response = AuthController.authService.register(username, password, email)
                 return Response(response, status=status.HTTP_201_CREATED)
+            except serializers.ValidationError as e:
+                return Response({'message': "Ошибка валидации", 'data': e.detail}, status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             

@@ -36,7 +36,7 @@ class UserService(IUsersService):
 
             return {'message': 'Пользователь успешно создан', 'data': serializedUser}
         except serializers.ValidationError as e:
-             return {'message': "Ошибка валидации", 'data': e.detail}
+             raise serializers.ValidationError(e.detail)
         except Exception as e:
             raise Exception(str(e))
         
@@ -54,7 +54,7 @@ class UserService(IUsersService):
 
             return {'message': 'Данные пользователя успешно изменены', 'data': serializedUser}
         except serializers.ValidationError as e:
-            return {'message': "Ошибка валидации", 'data': e.detail}
+            raise serializers.ValidationError(e.detail)
         except User.DoesNotExist:
             raise ObjectDoesNotExist('Запрашиваемый пользователь не найден или не существует')
         except Exception as e:

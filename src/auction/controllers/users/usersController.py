@@ -68,7 +68,7 @@ class UsersController(IUsersController):
                 response = UsersController.usersSerivce.create(username, password, email)
                 return Response(response, status=status.HTTP_200_OK)
             except serializers.ValidationError as e:
-                return Response({'message': "Ошибка валидации", 'data': e}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': "Ошибка валидации", 'data': e.detail}, status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
@@ -97,7 +97,7 @@ class UsersController(IUsersController):
             except ObjectDoesNotExist as e:
                 return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
             except serializers.ValidationError as e:
-                return Response({'message': "Ошибка валидации", 'data': e}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': "Ошибка валидации", 'data': e.detail}, status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             

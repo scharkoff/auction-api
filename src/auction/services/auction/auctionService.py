@@ -20,7 +20,7 @@ class AuctionService(IAuctionService):
 
             return {'message': 'Аукцион успешно создан', 'data': serializedAuction}
         except serializers.ValidationError as e:
-             return {'message': "Ошибка валидации", 'data': e.detail}
+            raise serializers.ValidationError(e.detail)
         except Exception as e:
             raise Exception(str(e))
 
@@ -41,7 +41,7 @@ class AuctionService(IAuctionService):
 
             return {'message': 'Аукцион успешно изменен', 'data': serializedAuction}
         except serializers.ValidationError as e:
-            return {'message': "Ошибка валидации", 'data': e.detail}
+           raise serializers.ValidationError(e.detail)
         except Auction.DoesNotExist:
             raise ObjectDoesNotExist('Запрашиваемый аукцион не найден или не существует')
         except Exception as e:
