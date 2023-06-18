@@ -44,7 +44,7 @@ class AuctionService(IAuctionService):
         except Auction.DoesNotExist:
             raise Exception('Запрашиваемый аукцион не найден или не существует')
 
-    def get(self, auctionId):
+    def getById(self, auctionId):
         try:
             auction = Auction.objects.get(id=auctionId)
             serializedAuction = AuctionSerializer(auction).data

@@ -70,14 +70,14 @@ class AuctionController(IAuctionController):
     @staticmethod
     @permission_classes([IsAuthenticated])
     @api_view(['GET'])
-    def get(request):
+    def getById(request):
         try:
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             auctionId = request.data.get('auctionId')
 
-            response = AuctionController.auctionService.get(auctionId)
+            response = AuctionController.auctionService.getById(auctionId)
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

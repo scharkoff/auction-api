@@ -18,7 +18,7 @@ class IAuctionController(ABC):
         pass
     
     @abstractmethod
-    def get(request):
+    def getById(request):
         pass
     
     @abstractmethod

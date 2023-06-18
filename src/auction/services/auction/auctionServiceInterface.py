@@ -18,7 +18,7 @@ class IAuctionService(ABC):
         pass
     
     @abstractmethod
-    def get(self, auctionId):
+    def getById(self, auctionId):
         pass
     
     @abstractmethod

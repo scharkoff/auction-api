@@ -2,13 +2,13 @@ from abc import ABC, abstractmethod
 
 class IAuthController(ABC):
     @abstractmethod
-    def register(self, request):
+    def register(request):
         pass
 
     @abstractmethod
-    def login(self, request):
+    def login(request):
         pass
 
     @abstractmethod
-    def logout(self, request):
+    def logout(request):
         pass
