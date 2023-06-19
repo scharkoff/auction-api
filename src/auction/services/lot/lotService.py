@@ -3,6 +3,7 @@ from rest_framework import serializers
 from auction.models.lot import Lot
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 
 class LotService():
     def __init__(self) -> None:
@@ -32,24 +33,26 @@ class LotService():
         
     def create(self, owner, auction, startTime, endTime, title, description, image):
         try:
-            startTime = self.convertMillisecondsToDatetime(startTime)
-            endTime = self.convertMillisecondsToDatetime(endTime)
+            with transaction.atomic():
+                startTime = self.convertMillisecondsToDatetime(startTime)
+                endTime = self.convertMillisecondsToDatetime(endTime)
 
-            lot = Lot(
-                auction=auction,
-                owner=owner,
-                start_time=startTime,
-                end_time=endTime,
-                title=title,
-                description=description,
-                image=image
-            )
+                lot = Lot(
+                    auction=auction,
+                    owner=owner,
+                    start_time=startTime,
+                    end_time=endTime,
+                    title=title,
+                    description=description,
+                    image=image
+                )
 
-            serializedLot = LotSerializer(lot).data
+                lot.save()
 
-            lot.save()
+                LotSerializer(data={"start_time": startTime, "end_time": endTime}).is_valid(raise_exception=True)
+                serializedLot = LotSerializer(lot).data
 
-            return {'message': 'Лот успешно создан', 'data': serializedLot}
+                return {'message': 'Лот успешно создан', 'data': serializedLot}
         except serializers.ValidationError as e:
              raise serializers.ValidationError(e.detail)
         except Exception as e:
@@ -57,22 +60,24 @@ class LotService():
         
     def update(self, lotId, startTime, endTime, title, description, image):
         try:
-            lot = Lot.objects.get(id=lotId)
+            with transaction.atomic():
+                lot = Lot.objects.get(id=lotId)
 
-            startTime = self.convertMillisecondsToDatetime(startTime)
-            endTime = self.convertMillisecondsToDatetime(endTime)
+                startTime = self.convertMillisecondsToDatetime(startTime)
+                endTime = self.convertMillisecondsToDatetime(endTime)
 
-            lot.start_time = startTime
-            lot.end_time = endTime
-            lot.title = title
-            lot.description = description
-            lot.image = image
+                lot.start_time = startTime
+                lot.end_time = endTime
+                lot.title = title
+                lot.description = description
+                lot.image = image
 
-            serializedLot = LotSerializer(lot).data
+                lot.save()
 
-            lot.save()
+                LotSerializer(data={"start_time": startTime, "end_time": endTime}).is_valid(raise_exception=True)
+                serializedLot = LotSerializer(lot).data
 
-            return {'message': 'Данные лота успешно изменены', 'data': serializedLot}
+                return {'message': 'Данные лота успешно изменены', 'data': serializedLot}
         except serializers.ValidationError as e:
             raise serializers.ValidationError(e.detail)
         except Lot.DoesNotExist:

@@ -94,10 +94,7 @@ class AuctionController(IAuctionController):
     @staticmethod
     @api_view(['GET'])
     def getById(request):
-        try:
-            if not request.user.is_authenticated or not request.user.is_active:
-                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
-            
+        try: 
             auctionId = request.data.get('auctionId')
 
             if not auctionId:
@@ -118,9 +115,7 @@ class AuctionController(IAuctionController):
     @api_view(['GET'])
     def getAll(request):
         try:
-            if not request.user.is_authenticated or not request.user.is_active:
-                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
-
+            
             try:
                 response = AuctionController.auctionService.getAll()
                 return Response(response, status=status.HTTP_200_OK)

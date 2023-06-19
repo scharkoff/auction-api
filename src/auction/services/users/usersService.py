@@ -3,6 +3,7 @@ from auction.serializers.user import UserSerializer
 from rest_framework import serializers
 from .usersServiceInterface import IUsersService
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 
 class UserService(IUsersService):
     def __init__(self) -> None:
@@ -29,12 +30,15 @@ class UserService(IUsersService):
         
     def create(self, username, password, email):
         try:
-            serializer = UserSerializer(data={'username': username, 'password': password, 'email': email})
-            serializer.is_valid(raise_exception=True)
-            user = serializer.save()
-            serializedUser = UserSerializer(user).data
+            with transaction.atomic():
+                serializer = UserSerializer(data={'username': username, 'password': password, 'email': email})
+                serializer.is_valid(raise_exception=True)
 
-            return {'message': 'Пользователь успешно создан', 'data': serializedUser}
+                user = serializer.save()
+
+                serializedUser = UserSerializer(user).data
+
+                return {'message': 'Пользователь успешно создан', 'data': serializedUser}
         except serializers.ValidationError as e:
              raise serializers.ValidationError(e.detail)
         except Exception as e:
@@ -42,21 +46,23 @@ class UserService(IUsersService):
         
     def update(self, userId, username, password, email):
         try:
-            user = User.objects.get(id=userId)
+            with transaction.atomic():
+                user = User.objects.get(id=userId)
 
-            user.username = username
-            user.set_password(password)
-            user.email = email
+                user.username = username
+                user.set_password(password)
+                user.email = email
 
-            data = {'username': username, 'password': password, 'email': email}
-            
-            serializer = UserSerializer(instance=user, data=data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+                data = {'username': username, 'password': password, 'email': email}
+                
+                serializer = UserSerializer(instance=user, data=data, partial=True)
+                serializer.is_valid(raise_exception=True)
 
-            serializedUser = UserSerializer(user).data
+                serializer.save()
 
-            return {'message': 'Данные пользователя успешно изменены', 'data': serializedUser}
+                serializedUser = UserSerializer(user).data
+
+                return {'message': 'Данные пользователя успешно изменены', 'data': serializedUser}
         except serializers.ValidationError as e:
             raise serializers.ValidationError(e.detail)
         except User.DoesNotExist:

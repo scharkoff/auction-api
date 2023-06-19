@@ -4,6 +4,7 @@ from .auctionServiceInterface import IAuctionService
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
+from django.db import transaction
 
 class AuctionService(IAuctionService):
     def __init__(self) -> None:
@@ -11,16 +12,17 @@ class AuctionService(IAuctionService):
 
     def create(self, title, startTime, endTime, owner):
         try:
-            startTime = self.convertMillisecondsToDatetime(startTime)
-            endTime = self.convertMillisecondsToDatetime(endTime)
-        
-            auction = Auction(title=title, start_time=startTime, end_time=endTime, owner=owner)
-
-            auction.save()
+            with transaction.atomic():
+                startTime = self.convertMillisecondsToDatetime(startTime)
+                endTime = self.convertMillisecondsToDatetime(endTime)
             
-            serializedAuction = AuctionSerializer(auction).data
+                auction = Auction(title=title, start_time=startTime, end_time=endTime, owner=owner)
 
-            return {'message': 'Аукцион успешно создан', 'data': serializedAuction}
+                auction.save()
+                
+                serializedAuction = AuctionSerializer(auction).data
+
+                return {'message': 'Аукцион успешно создан', 'data': serializedAuction}
         except serializers.ValidationError as e:
             raise serializers.ValidationError(e.detail)
         except Exception as e:
@@ -28,20 +30,23 @@ class AuctionService(IAuctionService):
 
     def update(self, auctionId, title=None, startTime=None, endTime=None):
         try:
-            startTime = self.convertMillisecondsToDatetime(startTime)
-            endTime = self.convertMillisecondsToDatetime(endTime)
+            with transaction.atomic():
+                startTime = self.convertMillisecondsToDatetime(startTime)
+                endTime = self.convertMillisecondsToDatetime(endTime)
 
-            auction = Auction.objects.get(id=auctionId)
-            if title:
-                auction.title = title
-            if startTime:
-                auction.start_time = startTime
-            if endTime:
-                auction.end_time = endTime
-            auction.save()
-            serializedAuction = AuctionSerializer(auction).data
+                auction = Auction.objects.get(id=auctionId)
+                if title:
+                    auction.title = title
+                if startTime:
+                    auction.start_time = startTime
+                if endTime:
+                    auction.end_time = endTime
 
-            return {'message': 'Аукцион успешно изменен', 'data': serializedAuction}
+                auction.save()
+
+                serializedAuction = AuctionSerializer(auction).data
+
+                return {'message': 'Аукцион успешно изменен', 'data': serializedAuction}
         except serializers.ValidationError as e:
            raise serializers.ValidationError(e.detail)
         except Auction.DoesNotExist:
@@ -51,11 +56,15 @@ class AuctionService(IAuctionService):
 
     def close(self, auctionId):
         try:
-            auction = Auction.objects.get(id=auctionId)
-            auction.is_closed = True
-            auction.save()
-            serializedAuction = AuctionSerializer(auction).data
-            return {'message': 'Аукцион успешно закрыт', 'data': serializedAuction}
+            with transaction.atomic():
+                auction = Auction.objects.get(id=auctionId)
+                auction.is_closed = True
+
+                auction.save()
+
+                serializedAuction = AuctionSerializer(auction).data
+
+                return {'message': 'Аукцион успешно закрыт', 'data': serializedAuction}
         except Auction.DoesNotExist:
             raise ObjectDoesNotExist('Запрашиваемый аукцион не найден или не существует')
         except Exception as e:
