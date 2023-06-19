@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from datetime import datetime
 from auction.models.lot import Lot
 
 class LotSerializer(serializers.ModelSerializer):

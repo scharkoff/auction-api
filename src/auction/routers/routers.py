@@ -15,6 +15,7 @@ urlpatterns = [
     path('auction/getById/', AuctionController.getById, name='getById'),
     path('auction/getAll/', AuctionController.getAll, name='getAll'),
     path('auction/search/', AuctionController.search, name='search'),
+    path('auction/delete/', AuctionController.delete, name='delete'),
 
     path('users/getAll/', UsersController.getAll, name='getAll'),
     path('users/getById/', UsersController.getById, name='getById'),

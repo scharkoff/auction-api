@@ -1,9 +1,12 @@
 from auction.serializers.lot import LotSerializer
 from rest_framework import serializers
 from auction.models.lot import Lot
+from auction.models.auction import Auction
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 class LotService():
     def __init__(self) -> None:
@@ -31,15 +34,18 @@ class LotService():
         except Exception as e:
             raise Exception(str(e))
         
-    def create(self, owner, auction, startTime, endTime, title, description, image):
+    def create(self, ownerId, auctionId, startTime, endTime, title, description, image):
         try:
             with transaction.atomic():
+                owner = get_object_or_404(User, id=ownerId)
+                auction = get_object_or_404(Auction, id=auctionId)
+
                 startTime = self.convertMillisecondsToDatetime(startTime)
                 endTime = self.convertMillisecondsToDatetime(endTime)
 
                 lot = Lot(
-                    auction=auction,
-                    owner=owner,
+                    auction_id=auction,
+                    owner_id=owner,
                     start_time=startTime,
                     end_time=endTime,
                     title=title,
@@ -49,7 +55,7 @@ class LotService():
 
                 lot.save()
 
-                LotSerializer(data={"start_time": startTime, "end_time": endTime}).is_valid(raise_exception=True)
+                LotSerializer(data={"owner_id": ownerId, "auction_id": auctionId, "start_time": startTime, "end_time": endTime}).is_valid(raise_exception=True)
                 serializedLot = LotSerializer(lot).data
 
                 return {'message': 'Лот успешно создан', 'data': serializedLot}
