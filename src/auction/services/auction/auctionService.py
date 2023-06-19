@@ -15,7 +15,9 @@ class AuctionService(IAuctionService):
             endTime = self.convertMillisecondsToDatetime(endTime)
         
             auction = Auction(title=title, start_time=startTime, end_time=endTime, owner=owner)
+
             auction.save()
+            
             serializedAuction = AuctionSerializer(auction).data
 
             return {'message': 'Аукцион успешно создан', 'data': serializedAuction}

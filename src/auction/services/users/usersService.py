@@ -64,15 +64,12 @@ class UserService(IUsersService):
         except Exception as e:
             raise Exception(str(e))
 
-
-        
     def delete(self, userId):
         try:
             user = User.objects.get(id=userId)
             user.delete()
 
             return {'message': 'Пользователь успешно удален'}
-        
         except User.DoesNotExist:
             raise ObjectDoesNotExist('Запрашиваемый пользователь не найден или не существует')
         except Exception as e:
