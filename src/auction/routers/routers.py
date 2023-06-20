@@ -3,6 +3,7 @@ from auction.controllers.auth.authController import AuthController
 from auction.controllers.auction.auctionController import AuctionController
 from auction.controllers.users.usersController import UsersController
 from auction.controllers.lot.lotController import LotController
+from auction.controllers.bid.bidController import BidController
 
 urlpatterns = [
     path('auth/login/', AuthController.login, name='login'),
@@ -28,4 +29,10 @@ urlpatterns = [
     path('lot/create/', LotController.create, name='create'),
     path('lot/update/', LotController.update, name='update'),
     path('lot/delete/', LotController.delete, name='delete'),
+
+    path('bid/getAll/', BidController.getAll, name='getAll'),
+    path('bid/getById/', BidController.getById, name='getById'),
+    path('bid/create/', BidController.create, name='create'),
+    path('bid/update/', BidController.update, name='update'),
+    path('bid/delete/', BidController.delete, name='delete'),
 ]

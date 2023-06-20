@@ -1,13 +1,13 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import status, serializers
-from auction.services.lot.lotService import LotService
+from rest_framework import serializers
+from auction.services.bid.bidService import BidService
 from django.core.exceptions import ObjectDoesNotExist
-from .lotControllerInterface import ILotController
+from .bidContollerInterface import IBidController
 
-class LotController(ILotController):
-    lotService = LotService()
+class BidController(IBidController):
+    bidService = BidService()
 
     @staticmethod
     @api_view(['POST'])
@@ -17,18 +17,19 @@ class LotController(ILotController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             ownerId = request.user.id
-            auctionId = request.data.get('auctionId')
-            startTime = request.data.get('startTime')
-            endTime = request.data.get('endTime')
-            title = request.data.get('title')
-            description = request.data.get('description')
-            image = request.data.get('image')
+            lotId = request.data.get('lotId')
+            price = request.data.get('price')
+
+            if not ownerId or not lotId or not price:
+              raise Exception("Неправильный формат запроса")
 
             try:
-                response = LotController.lotService.create(ownerId, auctionId, startTime, endTime, title, description, image)
+                response = BidController.bidService.create(ownerId, lotId, price)
                 return Response(response, status=status.HTTP_201_CREATED)
             except serializers.ValidationError as e:
-                return Response({'message': "Ошибка валидации", 'data': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'Ошибка валидации', 'data': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+            except ObjectDoesNotExist as e:
+                return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
             except Exception as e:
                 return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
@@ -39,9 +40,8 @@ class LotController(ILotController):
     @api_view(['GET'])
     def getAll(request):
         try:
-
             try:
-                response = LotController.lotService.getAll()
+                response = BidController.bidService.getAll()
                 return Response(response, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -53,10 +53,14 @@ class LotController(ILotController):
     @api_view(['GET'])
     def getById(request):
         try:
-            lotId = request.data.get('lotId')
+          
+            bidId = request.data.get('bidId')
+
+            if not bidId:
+                raise Exception("Неправильный формат запроса")
             
             try:
-                response = LotController.lotService.getById(lotId)
+                response = BidController.bidService.getById(bidId)
                 return Response(response, status=status.HTTP_200_OK)
             except ObjectDoesNotExist as e:
                 return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
@@ -73,20 +77,20 @@ class LotController(ILotController):
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
-            lotId = request.data.get('lotId')
-            startTime = request.data.get('startTime')
-            endTime = request.data.get('endTime')
-            title = request.data.get('title')
-            description = request.data.get('description')
-            image = request.data.get('image')
+            bidId = request.data.get('bidId')
+            price = request.data.get('price')
+
+            if not bidId or not price:
+                raise Exception("Неправильный формат запроса")
+            
 
             try:
-                response = LotController.lotService.update(lotId, startTime, endTime, title, description, image)
+                response = BidController.bidService.update(bidId, price)
                 return Response(response, status=status.HTTP_200_OK)
             except ObjectDoesNotExist as e:
                 return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
             except serializers.ValidationError as e:
-                return Response({'message': "Ошибка валидации", 'data': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'Ошибка валидации', 'data': e.detail}, status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -100,10 +104,13 @@ class LotController(ILotController):
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
-            lotId = request.data.get('lotId')
+            bidId = request.data.get('bidId')
 
+            if not bidId:
+                raise Exception("Неправильный формат запроса")
+            
             try:
-                response = LotController.lotService.delete(lotId)
+                response = BidController.bidService.delete(bidId)
                 return Response(response, status=status.HTTP_200_OK)
             except ObjectDoesNotExist as e:
                 return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)

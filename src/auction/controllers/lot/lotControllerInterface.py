@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class IAuctionController(ABC):
+class ILotController(ABC):
     @abstractmethod
     def create(request):
         pass
@@ -10,17 +10,13 @@ class IAuctionController(ABC):
         pass
 
     @abstractmethod
-    def close(request):
+    def delete(request):
         pass
-
+    
     @abstractmethod
     def getById(request):
         pass
     
     @abstractmethod
-    def search(request):
-        pass
-        
-    @abstractmethod
-    def delete(request):
+    def getAll(request):
         pass

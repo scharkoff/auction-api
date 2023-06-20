@@ -7,8 +7,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from .lotServiceInterface import ILotService
 
-class LotService():
+class LotService(ILotService):
     def __init__(self) -> None:
         pass
     
