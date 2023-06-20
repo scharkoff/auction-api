@@ -38,50 +38,69 @@ class LotService(ILotService):
     def create(self, ownerId, auctionId, startTime, endTime, title, description, image):
         try:
             with transaction.atomic():
-                owner = get_object_or_404(User, id=ownerId)
-                auction = get_object_or_404(Auction, id=auctionId)
-
                 startTime = self.convertMillisecondsToDatetime(startTime)
                 endTime = self.convertMillisecondsToDatetime(endTime)
 
-                lot = Lot(
-                    auction_id=auction,
-                    owner_id=owner,
-                    start_time=startTime,
-                    end_time=endTime,
-                    title=title,
-                    description=description,
-                    image=image
-                )
+                dataToValidate = {
+                    "title": title, 
+                    "description": description, 
+                    "owner_id": ownerId, 
+                    "auction_id": auctionId, 
+                    "start_time": startTime, 
+                    "end_time": endTime,
+                    "image": image
+                }
 
-                lot.save()
+                serializer = LotSerializer(data=dataToValidate)
+                
+                serializer.is_valid(raise_exception=True)
+                
+                lot = serializer.save()
 
-                LotSerializer(data={"owner_id": ownerId, "auction_id": auctionId, "start_time": startTime, "end_time": endTime}).is_valid(raise_exception=True)
                 serializedLot = LotSerializer(lot).data
 
                 return {'message': 'Лот успешно создан', 'data': serializedLot}
         except serializers.ValidationError as e:
-             raise serializers.ValidationError(e.detail)
+            raise serializers.ValidationError(e.detail)
         except Exception as e:
             raise Exception(str(e))
+
         
     def update(self, lotId, startTime, endTime, title, description, image):
         try:
             with transaction.atomic():
                 lot = Lot.objects.get(id=lotId)
 
-                startTime = self.convertMillisecondsToDatetime(startTime)
-                endTime = self.convertMillisecondsToDatetime(endTime)
+                dataToUpdate = {}
 
-                lot.start_time = startTime
-                lot.end_time = endTime
-                lot.title = title
-                lot.description = description
-                lot.image = image
+                if startTime is not None:
+                    startTime = self.convertMillisecondsToDatetime(startTime)
+                    dataToUpdate.update({"start_time": startTime})
+                    lot.start_time = startTime
+                
+                if endTime is not None:
+                    endTime = self.convertMillisecondsToDatetime(endTime)
+                    dataToUpdate.update({"end_time": endTime})
+                    lot.end_time = endTime
 
-                lot.save()
+                if title is not None:
+                    dataToUpdate.update({"title": title})
+                    lot.title = title
 
-                LotSerializer(data={"start_time": startTime, "end_time": endTime}).is_valid(raise_exception=True)
+                if description is not None:
+                    dataToUpdate.update({"description": description})
+                    lot.description = description
+
+                if image is not None:
+                    dataToUpdate.update({"image": image})
+                    lot.image = image
+
+                serializer = LotSerializer(instance=lot, data=dataToUpdate, partial=True)
+
+                serializer.is_valid(raise_exception=True)
+
+                lot = serializer.save()
+
                 serializedLot = LotSerializer(lot).data
 
                 return {'message': 'Данные лота успешно изменены', 'data': serializedLot}

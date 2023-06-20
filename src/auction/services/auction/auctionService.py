@@ -5,8 +5,6 @@ from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from django.db import transaction
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
 
 class AuctionService(IAuctionService):
     def __init__(self) -> None:
@@ -15,16 +13,22 @@ class AuctionService(IAuctionService):
     def create(self, title, startTime, endTime, ownerId):
         try:
             with transaction.atomic():
-                owner = get_object_or_404(User, id=ownerId)
-
                 startTime = self.convertMillisecondsToDatetime(startTime)
                 endTime = self.convertMillisecondsToDatetime(endTime)
             
-                auction = Auction(title=title, start_time=startTime, end_time=endTime, owner_id=owner)
+                dataToValidate = {
+                    "owner_id": ownerId,
+                    "title": title,
+                    "start_time": startTime,
+                    "end_time": endTime
+                }
 
-                auction.save()
+                serializer = AuctionSerializer(data=dataToValidate)
                 
-                AuctionSerializer(data={"owner_id": ownerId,"start_time": startTime, "end_time": endTime}).is_valid(raise_exception=True)
+                serializer.is_valid(raise_exception=True)
+
+                auction = serializer.save()
+
                 serializedAuction = AuctionSerializer(auction).data
 
                 return {'message': 'Аукцион успешно создан', 'data': serializedAuction}
@@ -33,23 +37,34 @@ class AuctionService(IAuctionService):
         except Exception as e:
             raise Exception(str(e))
 
+
     def update(self, auctionId, title=None, startTime=None, endTime=None):
         try:
             with transaction.atomic():
-                startTime = self.convertMillisecondsToDatetime(startTime)
-                endTime = self.convertMillisecondsToDatetime(endTime)
-
                 auction = Auction.objects.get(id=auctionId)
-                if title:
-                    auction.title = title
-                if startTime:
+
+                dataToUpdate = {}
+
+                if startTime is not None:
+                    startTime = self.convertMillisecondsToDatetime(startTime)
+                    dataToUpdate.update({"start_time": startTime})
                     auction.start_time = startTime
-                if endTime:
+                
+                if endTime is not None:
+                    endTime = self.convertMillisecondsToDatetime(endTime)
+                    dataToUpdate.update({"end_time": endTime})
                     auction.end_time = endTime
 
-                auction.save()
+                if title is not None:
+                    dataToUpdate.update({"title": title})
+                    auction.title = title
 
-                AuctionSerializer(data={"start_time": startTime, "end_time": endTime}).is_valid(raise_exception=True)
+                serializer = AuctionSerializer(instance=auction, data=dataToUpdate, partial=True)
+
+                serializer.is_valid(raise_exception=True)
+
+                auction = serializer.save(auction_id=auction)
+
                 serializedAuction = AuctionSerializer(auction).data
 
                 return {'message': 'Аукцион успешно изменен', 'data': serializedAuction}

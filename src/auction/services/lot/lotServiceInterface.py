@@ -2,21 +2,21 @@ from abc import ABC, abstractmethod
 
 class ILotService(ABC):
     @abstractmethod
-    def create(request):
+    def create(self, ownerId, auctionId, startTime, endTime, title, description, image):
         pass
 
     @abstractmethod
-    def update(request):
+    def update(self, lotId, startTime, endTime, title, description, image):
         pass
 
     @abstractmethod
-    def delete(request):
+    def delete(self, lotId):
         pass
     
     @abstractmethod
-    def getById(request):
+    def getById(self, lotId):
         pass
     
     @abstractmethod
-    def getAll(request):
+    def getAll(self):
         pass

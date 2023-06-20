@@ -34,16 +34,21 @@ class BidService(IBidService):
     def create(self, ownerId, lotId, price):
         try:
             with transaction.atomic():
-              owner = get_object_or_404(User, id=ownerId)
-              lot = get_object_or_404(Lot, id=lotId)
+                dataToValidate = {
+                    "owner_id": ownerId,
+                    "lot_id": lotId,
+                    "price": price
+                }
 
-              bid = Bid(owner_id=owner, lot_id=lot, price=price)
+                serializer = BidSerializer(data=dataToValidate)
 
-              bid.save()
+                serializer.is_valid(raise_exception=True)
 
-              serializedBid = BidSerializer(bid).data
+                bid = serializer.save()
 
-              return {'message': 'Ставка успешно создана', 'data': serializedBid}
+                serializedBid = BidSerializer(bid).data
+
+                return {'message': 'Ставка успешно создана', 'data': serializedBid}
         except serializers.ValidationError as e:
             raise serializers.ValidationError(e.detail)
         except Exception as e:
@@ -56,7 +61,11 @@ class BidService(IBidService):
 
               bid.price = price
 
-              bid.save()
+              serializer = BidSerializer(instance=bid, data={"price": price}, partial=True)
+                
+              serializer.is_valid(raise_exception=True)
+
+              bid = serializer.save()
 
               serializedBid = BidSerializer(bid).data
 

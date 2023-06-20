@@ -46,12 +46,12 @@ class AuctionController(IAuctionController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             auctionId = request.data.get('auctionId')
-            title = request.data.get('title')
-            startTime = request.data.get('startTime')
-            endTime = request.data.get('endTime')
+            title = request.data.get('title', None)
+            startTime = request.data.get('startTime', None)
+            endTime = request.data.get('endTime', None)
 
-            if not auctionId or not title or not startTime or not endTime:
-                raise Exception("Неправильный формат запроса")
+            if not title and not startTime and not endTime:
+                raise Exception("Хотя бы одно поле должно быть заполнено") 
 
             try:
                 response = AuctionController.auctionService.update(auctionId, title, startTime, endTime)

@@ -84,15 +84,16 @@ class UsersController(IUsersController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             userId = request.data.get('userId')
-            username = request.data.get('username')
-            password = request.data.get('password')
-            email = request.data.get('email')
+            username = request.data.get('username', None)
+            password = request.data.get('password', None)
+            email = request.data.get('email', None)
+            role = request.data.get('role', None)
 
-            if not userId or not username or not password or not email:
-                raise Exception("Неправильный формат запроса") 
+            if (not username and not password and not email and not role):
+                raise Exception("Хотя бы одно поле должно быть заполнено") 
 
             try:  
-                response = UsersController.usersSerivce.update(userId, username, password, email)
+                response = UsersController.usersSerivce.update(userId, username, password, email, role)
                 return Response(response, status=status.HTTP_200_OK)
             except ObjectDoesNotExist as e:
                 return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)

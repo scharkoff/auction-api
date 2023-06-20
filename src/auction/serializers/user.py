@@ -29,4 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("Данный логин уже используется")
+        
+        if len(value) < 3:
+            raise serializers.ValidationError("Логин не может быть меньше 3-х символов")
         return value

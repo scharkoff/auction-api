@@ -83,7 +83,6 @@ class BidController(IBidController):
             if not bidId or not price:
                 raise Exception("Неправильный формат запроса")
             
-
             try:
                 response = BidController.bidService.update(bidId, price)
                 return Response(response, status=status.HTTP_200_OK)

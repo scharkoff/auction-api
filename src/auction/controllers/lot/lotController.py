@@ -74,11 +74,14 @@ class LotController(ILotController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             lotId = request.data.get('lotId')
-            startTime = request.data.get('startTime')
-            endTime = request.data.get('endTime')
-            title = request.data.get('title')
-            description = request.data.get('description')
-            image = request.data.get('image')
+            startTime = request.data.get('startTime', None)
+            endTime = request.data.get('endTime', None)
+            title = request.data.get('title', None)
+            description = request.data.get('description', None)
+            image = request.data.get('image', None)
+
+            if (not startTime and not endTime and not title and not description and not image):
+                raise Exception("Хотя бы одно поле должно быть заполнено") 
 
             try:
                 response = LotController.lotService.update(lotId, startTime, endTime, title, description, image)

@@ -2,21 +2,21 @@ from abc import ABC, abstractmethod
 
 class IBidService(ABC):
     @abstractmethod
-    def create(request):
+    def create(self, ownerId, lotId, price):
         pass
 
     @abstractmethod
-    def update(request):
+    def update(self, bidId, price):
         pass
 
     @abstractmethod
-    def delete(request):
+    def delete(self, bidId):
         pass
     
     @abstractmethod
-    def getById(request):
+    def getById(self, bidId):
         pass
     
     @abstractmethod
-    def getAll(request):
+    def getAll(self):
         pass

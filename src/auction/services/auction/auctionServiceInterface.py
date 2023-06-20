@@ -6,7 +6,7 @@ class IAuctionService(ABC):
         pass
 
     @abstractmethod
-    def update(self, auctionId, title=None, startTime=None, endTime=None):
+    def update(self, auctionId, title, startTime, endTime):
         pass
 
     @abstractmethod

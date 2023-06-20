@@ -32,6 +32,7 @@ class UserService(IUsersService):
         try:
             with transaction.atomic():
                 serializer = UserSerializer(data={'username': username, 'password': password, 'email': email})
+                
                 serializer.is_valid(raise_exception=True)
 
                 user = serializer.save()
@@ -44,18 +45,31 @@ class UserService(IUsersService):
         except Exception as e:
             raise Exception(str(e))
         
-    def update(self, userId, username, password, email):
+    def update(self, userId, username, password, email, role):
         try:
             with transaction.atomic():
                 user = User.objects.get(id=userId)
 
-                user.username = username
-                user.set_password(password)
-                user.email = email
+                dataToUpdate = {}
 
-                data = {'username': username, 'password': password, 'email': email}
-                
-                serializer = UserSerializer(instance=user, data=data, partial=True)
+                if username is not None:
+                    user.username = username
+                    dataToUpdate.update({'username': username})
+
+                if password is not None:
+                    user.set_password(password)
+                    dataToUpdate.update({'password': password})
+
+                if email is not None:
+                    user.email = email
+                    dataToUpdate.update({'email': email})
+
+                if role is not None:
+                    user.role = role
+                    dataToUpdate.update({'role': role})
+
+                serializer = UserSerializer(instance=user, data=dataToUpdate, partial=True)
+
                 serializer.is_valid(raise_exception=True)
 
                 serializer.save()
