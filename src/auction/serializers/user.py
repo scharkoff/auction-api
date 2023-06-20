@@ -10,9 +10,16 @@ class UserSerializer(serializers.ModelSerializer):
         )
     ])
 
+    ROLE_CHOICES = [
+        ('user', 'User'),
+        ('admin', 'Admin'),
+    ]
+
+    role = serializers.ChoiceField(choices=ROLE_CHOICES, default='user')
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
+        fields = ['id', 'username', 'email', 'role']
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
@@ -23,6 +30,3 @@ class UserSerializer(serializers.ModelSerializer):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("Данный логин уже используется")
         return value
-    
-
-
