@@ -32,7 +32,6 @@ class UserService(IUsersService):
         try:
             with transaction.atomic():
                 serializer = UserSerializer(data={'username': username, 'password': password, 'email': email})
-                
                 serializer.is_valid(raise_exception=True)
 
                 user = serializer.save()

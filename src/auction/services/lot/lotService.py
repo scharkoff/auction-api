@@ -1,12 +1,9 @@
 from auction.serializers.lot import LotSerializer
 from rest_framework import serializers
 from auction.models.lot import Lot
-from auction.models.auction import Auction
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
 from .lotServiceInterface import ILotService
 
 class LotService(ILotService):

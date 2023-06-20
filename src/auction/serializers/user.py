@@ -33,3 +33,20 @@ class UserSerializer(serializers.ModelSerializer):
         if len(value) < 3:
             raise serializers.ValidationError("Логин не может быть меньше 3-х символов")
         return value
+    
+    def create(self, validated_data):
+        role = validated_data.pop('role', 'user')
+        password = validated_data.pop('password')
+        user = User.objects.create(**validated_data)
+        user.set_password(password)
+        user.role = role
+        user.save()
+        return user
+    
+    def update(self, instance, validated_data):
+        role = validated_data.pop('role', None)
+        
+        if role is not None:
+            instance.role = role
+        
+        return super().update(instance, validated_data)

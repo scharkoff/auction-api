@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.decorators import api_view
 from auction.services.auction.auctionService import AuctionService
 from .auctionControllerInterface import IAuctionController
+from auction.models.auction import Auction
 
 
 class AuctionController(IAuctionController):
@@ -44,6 +45,10 @@ class AuctionController(IAuctionController):
         try:
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            auction = Auction.objects.get(id=auctionId)
+            if not auction.owner_id == request.user or request.user.role != 'admin':
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
             
             auctionId = request.data.get('auctionId')
             title = request.data.get('title', None)

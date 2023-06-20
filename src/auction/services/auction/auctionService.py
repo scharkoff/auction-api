@@ -38,7 +38,7 @@ class AuctionService(IAuctionService):
             raise Exception(str(e))
 
 
-    def update(self, auctionId, title=None, startTime=None, endTime=None):
+    def update(self, auctionId, title, startTime, endTime):
         try:
             with transaction.atomic():
                 auction = Auction.objects.get(id=auctionId)

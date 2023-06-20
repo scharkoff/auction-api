@@ -13,7 +13,7 @@ class AuthService(IAuthService):
 
                 serializer.is_valid(raise_exception=True)
 
-                user = serializer.save()
+                user = serializer.save(password=password)
 
                 serializedUser = UserSerializer(user).data
 
@@ -21,6 +21,7 @@ class AuthService(IAuthService):
         except serializers.ValidationError as e:
             raise serializers.ValidationError(e.detail)
         except Exception as e:
+            print(e)
             raise Exception(str(e))
 
     def login(self, request, username, password):
