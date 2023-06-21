@@ -46,11 +46,12 @@ class AuctionController(IAuctionController):
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
-            auction = Auction.objects.get(id=auctionId)
-            if not auction.owner_id == request.user or request.user.is_superuser:
-                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
-            
             auctionId = request.data.get('auctionId')
+
+            auction = Auction.objects.get(id=auctionId)
+            if auction.owner_id != request.user.id and not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
+
             title = request.data.get('title', None)
             startTime = request.data.get('startTime', None)
             endTime = request.data.get('endTime', None)
@@ -79,6 +80,10 @@ class AuctionController(IAuctionController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             auctionId = request.data.get('auctionId')
+
+            auction = Auction.objects.get(id=auctionId)
+            if auction.owner_id != request.user.id and not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
 
             if not auctionId:
                 raise Exception("Неправильный формат запроса")
@@ -159,6 +164,13 @@ class AuctionController(IAuctionController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             auctionId = request.data.get('auctionId')
+
+            if not auctionId:
+                raise Exception("Неправильный формат запроса")
+
+            auction = Auction.objects.get(id=auctionId)
+            if auction.owner_id != request.user.id and not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
 
             try:
                 response = AuctionController.auctionService.delete(auctionId)

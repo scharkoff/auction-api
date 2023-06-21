@@ -1,5 +1,6 @@
 from rest_framework import status, serializers
 from rest_framework.response import Response
+from django.contrib.auth.models import User
 from auction.services.users.usersService import UserService
 from .usersControllerInterface import IUsersController
 from rest_framework.decorators import api_view
@@ -84,6 +85,11 @@ class UsersController(IUsersController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             userId = request.data.get('userId')
+
+            user = User.objects.get(id=userId)
+            if user.id != request.user.id and not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
+            
             username = request.data.get('username', None)
             fisrstName = request.data.get('firstName', None)
             lastName = request.data.get('lastName', None)
@@ -112,6 +118,10 @@ class UsersController(IUsersController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             userId = request.data.get('userId')
+
+            user = User.objects.get(id=userId)
+            if user.id != request.user.id and not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
 
             if not userId:
                 raise Exception("Неправильный формат запроса") 

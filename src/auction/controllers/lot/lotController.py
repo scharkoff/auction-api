@@ -5,6 +5,7 @@ from rest_framework import status, serializers
 from auction.services.lot.lotService import LotService
 from django.core.exceptions import ObjectDoesNotExist
 from .lotControllerInterface import ILotController
+from auction.models.lot import Lot
 
 class LotController(ILotController):
     lotService = LotService()
@@ -74,6 +75,11 @@ class LotController(ILotController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             lotId = request.data.get('lotId')
+
+            lot = Lot.objects.get(id=lotId)
+            if lot.owner_id != request.user.id and not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
+            
             startTime = request.data.get('startTime', None)
             endTime = request.data.get('endTime', None)
             title = request.data.get('title', None)
@@ -104,6 +110,13 @@ class LotController(ILotController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             lotId = request.data.get('lotId')
+
+            if not lotId:
+                raise Exception("Неправильный формат запроса") 
+            
+            lot = Lot.objects.get(id=lotId)
+            if lot.owner_id != request.user.id and not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
 
             try:
                 response = LotController.lotService.delete(lotId)

@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import serializers
+from auction.models.bid import Bid
 from auction.services.bid.bidService import BidService
 from django.core.exceptions import ObjectDoesNotExist
 from .bidContollerInterface import IBidController
@@ -78,6 +79,11 @@ class BidController(IBidController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             bidId = request.data.get('bidId')
+
+            bid = Bid.objects.get(id=bidId)
+            if bid.owner_id != request.user.id and not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
+            
             price = request.data.get('price')
 
             if not bidId or not price:
@@ -107,7 +113,11 @@ class BidController(IBidController):
 
             if not bidId:
                 raise Exception("Неправильный формат запроса")
-            
+
+            bid = Bid.objects.get(id=bidId)
+            if bid.owner_id != request.user.id and not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
+
             try:
                 response = BidController.bidService.delete(bidId)
                 return Response(response, status=status.HTTP_200_OK)
