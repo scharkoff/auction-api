@@ -10,16 +10,16 @@ class UserSerializer(serializers.ModelSerializer):
         )
     ])
 
-    ROLE_CHOICES = [
-        ('user', 'User'),
-        ('admin', 'Admin'),
-    ]
-
-    role = serializers.ChoiceField(choices=ROLE_CHOICES, default='user')
-
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'role']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_superuser', 'date_joined', 'last_login', 'is_active']
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = User.objects.create(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
@@ -34,19 +34,3 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Логин не может быть меньше 3-х символов")
         return value
     
-    def create(self, validated_data):
-        role = validated_data.pop('role', 'user')
-        password = validated_data.pop('password')
-        user = User.objects.create(**validated_data)
-        user.set_password(password)
-        user.role = role
-        user.save()
-        return user
-    
-    def update(self, instance, validated_data):
-        role = validated_data.pop('role', None)
-        
-        if role is not None:
-            instance.role = role
-        
-        return super().update(instance, validated_data)

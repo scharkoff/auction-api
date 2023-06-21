@@ -85,15 +85,14 @@ class UsersController(IUsersController):
             
             userId = request.data.get('userId')
             username = request.data.get('username', None)
+            fisrstName = request.data.get('firstName', None)
+            lastName = request.data.get('lastName', None)
             password = request.data.get('password', None)
             email = request.data.get('email', None)
-            role = request.data.get('role', None)
-
-            if (not username and not password and not email and not role):
-                raise Exception("Хотя бы одно поле должно быть заполнено") 
+            isSuperuser = request.data.get('isSuperuser', None)
 
             try:  
-                response = UsersController.usersSerivce.update(userId, username, password, email, role)
+                response = UsersController.usersSerivce.update(userId, username, fisrstName, lastName, password, email, isSuperuser)
                 return Response(response, status=status.HTTP_200_OK)
             except ObjectDoesNotExist as e:
                 return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)

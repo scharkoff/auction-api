@@ -6,6 +6,10 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.db import transaction
 
 class AuthService(IAuthService):
+
+    def __init__(self) -> None:
+        super().__init__()
+
     def register(self, username, password, email):
         try:
             with transaction.atomic():
@@ -21,7 +25,6 @@ class AuthService(IAuthService):
         except serializers.ValidationError as e:
             raise serializers.ValidationError(e.detail)
         except Exception as e:
-            print(e)
             raise Exception(str(e))
 
     def login(self, request, username, password):

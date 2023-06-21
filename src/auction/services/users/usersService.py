@@ -44,7 +44,7 @@ class UserService(IUsersService):
         except Exception as e:
             raise Exception(str(e))
         
-    def update(self, userId, username, password, email, role):
+    def update(self, userId, username, fisrstName, lastName, password, email, isSuperuser):
         try:
             with transaction.atomic():
                 user = User.objects.get(id=userId)
@@ -55,6 +55,14 @@ class UserService(IUsersService):
                     user.username = username
                     dataToUpdate.update({'username': username})
 
+                if fisrstName is not None:
+                    user.fisrstName = fisrstName
+                    dataToUpdate.update({'first_name': fisrstName})
+
+                if lastName is not None:
+                    user.lastName = lastName
+                    dataToUpdate.update({'last_name': lastName})
+
                 if password is not None:
                     user.set_password(password)
                     dataToUpdate.update({'password': password})
@@ -63,9 +71,9 @@ class UserService(IUsersService):
                     user.email = email
                     dataToUpdate.update({'email': email})
 
-                if role is not None:
-                    user.role = role
-                    dataToUpdate.update({'role': role})
+                if isSuperuser is not None:
+                    user.isSuperuser = isSuperuser
+                    dataToUpdate.update({'is_superuser': isSuperuser})
 
                 serializer = UserSerializer(instance=user, data=dataToUpdate, partial=True)
 

@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'auction',
+    'auction.apps.AuctionConfig',
     'rest_framework',
 ]
 
@@ -79,8 +79,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication', 
     ],
 }
-
-# AUTH_USER_MODEL = 'auction.CustomUser'
 
 SESSION_COOKIE_AGE = 1800
 CSRF_USE_SESSIONS = True

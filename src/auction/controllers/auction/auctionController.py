@@ -47,7 +47,7 @@ class AuctionController(IAuctionController):
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
             auction = Auction.objects.get(id=auctionId)
-            if not auction.owner_id == request.user or request.user.role != 'admin':
+            if not auction.owner_id == request.user or request.user.is_superuser:
                 return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
             
             auctionId = request.data.get('auctionId')
