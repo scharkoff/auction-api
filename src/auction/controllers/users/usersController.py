@@ -16,8 +16,12 @@ class UsersController(IUsersController):
     @api_view(['GET'])
     def getAll(request):
         try:
+          
           if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+          
+          if not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
           
           try:
               response = UsersController.usersSerivce.getAll()
@@ -34,6 +38,9 @@ class UsersController(IUsersController):
         try:
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            if not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
             
             userId = request.data.get('userId')
 
