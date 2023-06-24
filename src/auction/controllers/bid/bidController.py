@@ -57,7 +57,7 @@ class BidController(IBidController):
     def getById(request):
         try:
           
-            bidId = request.data.get('bidId')
+            bidId = request.query_params.get('id', None)
 
             if not bidId:
                 raise Exception("Неправильный формат запроса")

@@ -56,7 +56,10 @@ class LotController(ILotController):
     @api_view(['GET'])
     def getById(request):
         try:
-            lotId = request.data.get('lotId')
+            lotId = request.query_params.get('id', None)
+
+            if not lotId:
+                raise Exception("Неправильный формат запроса")
             
             try:
                 response = LotController.lotService.getById(lotId)

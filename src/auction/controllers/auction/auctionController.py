@@ -103,7 +103,7 @@ class AuctionController(IAuctionController):
     @api_view(['GET'])
     def getById(request):
         try: 
-            auctionId = request.data.get('auctionId')
+            auctionId = request.query_params.get('id', None)
 
             if not auctionId:
                 raise Exception("Неправильный формат запроса")
