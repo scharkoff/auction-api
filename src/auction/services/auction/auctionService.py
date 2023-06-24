@@ -10,7 +10,7 @@ class AuctionService(IAuctionService):
     def __init__(self) -> None:
         pass
 
-    def create(self, title, startTime, endTime, ownerId):
+    def create(self, title, description, startTime, endTime, ownerId):
         try:
             with transaction.atomic():
                 startTime = self.convertMillisecondsToDatetime(startTime)
@@ -20,7 +20,8 @@ class AuctionService(IAuctionService):
                     "owner_id": ownerId,
                     "title": title,
                     "start_time": startTime,
-                    "end_time": endTime
+                    "end_time": endTime,
+                    "description": description
                 }
 
                 serializer = AuctionSerializer(data=dataToValidate)
@@ -120,7 +121,12 @@ class AuctionService(IAuctionService):
 
     def search(self, query):
         try:
-            auctions = Auction.objects.filter(title__icontains=query)
+            
+            if (query == ''):
+                 auctions = Auction.objects.all()
+            else:
+                auctions = Auction.objects.filter(title__icontains=query)
+
             serializedAuctions = AuctionSerializer(auctions, many=True).data
 
             return {'message': 'Аукцион(ы) успешно найден(ы)', 'data': serializedAuctions}

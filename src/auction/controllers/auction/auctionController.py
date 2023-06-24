@@ -22,6 +22,7 @@ class AuctionController(IAuctionController):
              
             ownerId = request.user.id
             title = request.data.get('title')
+            description = request.data.get('description')
             startTime = request.data.get('startTime')
             endTime = request.data.get('endTime')
 
@@ -29,7 +30,7 @@ class AuctionController(IAuctionController):
                 raise Exception("Неправильный формат запроса")
 
             try:
-                response = AuctionController.auctionService.create(title, startTime, endTime, ownerId)
+                response = AuctionController.auctionService.create(title, description, startTime, endTime, ownerId)
                 return Response(response, status=status.HTTP_201_CREATED)
             except serializers.ValidationError as e:
                 return Response({'message': "Ошибка валидации", 'data': e.detail}, status=status.HTTP_400_BAD_REQUEST)
@@ -136,16 +137,10 @@ class AuctionController(IAuctionController):
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
     @staticmethod
-    @api_view(['POST'])
+    @api_view(['GET'])
     def search(request):
-        try:
-            if not request.user.is_authenticated or not request.user.is_active:
-                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
-            
-            query = request.data.get('query')
-
-            if not query:
-                raise Exception("Неправильный формат запроса")
+        try:   
+            query = request.query_params.get('query', '')
 
             try:
                 response = AuctionController.auctionService.search(query)
