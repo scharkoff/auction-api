@@ -102,11 +102,11 @@ class AuctionService(IAuctionService):
         except Exception as e:
             raise Exception(str(e))
         
-    def getAll(self, owner_id):
+    def getAll(self, ownerId):
         try:
 
-            if owner_id is not None:
-                auctions = Auction.objects.filter(owner_id=owner_id)
+            if ownerId is not None and ownerId != 0:
+                auctions = Auction.objects.filter(owner_id=ownerId)
             else:
                 auctions = Auction.objects.all()
             
