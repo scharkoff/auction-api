@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
 from auction.serializers.user import UserSerializer
 from rest_framework import serializers
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from .authServiceInterface import IAuthService
 from rest_framework.exceptions import AuthenticationFailed
 from django.db import transaction
@@ -44,6 +46,19 @@ class AuthService(IAuthService):
             raise AuthenticationFailed('Неверные учетные данные пользователя')
         except Exception as e:
             raise Exception(str(e))
+        
+    def auth(self, userId):
+        try:
+            user = User.objects.get(id=userId)
+
+            serializedUser = UserSerializer(user).data
+
+            return {'message': 'Пользователь успешно найден', 'data': serializedUser}
+        except User.DoesNotExist:
+            raise ObjectDoesNotExist('Запрашиваемый пользователь не найден или не существует')
+        except Exception as e:
+            raise Exception(str(e))
+        
 
     def logout(self, request):
         try:

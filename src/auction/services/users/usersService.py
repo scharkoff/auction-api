@@ -12,7 +12,9 @@ class UserService(IUsersService):
     def getAll(self):
         try:
             users = User.objects.all()
+
             serializedUsers = UserSerializer(users, many=True).data
+            
             return {'message': 'Пользователи успешно найдены', 'data': serializedUsers}
         except Exception as e:
             raise Exception(str(e))
@@ -20,9 +22,10 @@ class UserService(IUsersService):
     def getById(self, userId):
         try:
             user = User.objects.get(id=userId)
+
             serializedUser = UserSerializer(user).data
+
             return {'message': 'Пользователь успешно найден', 'data': serializedUser}
-        
         except User.DoesNotExist:
             raise ObjectDoesNotExist('Запрашиваемый пользователь не найден или не существует')
         except Exception as e:
