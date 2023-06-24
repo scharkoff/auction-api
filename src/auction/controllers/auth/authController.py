@@ -57,13 +57,13 @@ class AuthController(IAuthController):
         
     @staticmethod  
     @api_view(['GET'])  
-    def auth(request):
+    def getSessionUserData(request):
         try:
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
 
             try:
-                response = AuthController.authService.auth(request, request.user.id)
+                response = AuthController.authService.getSessionUserData(request.user.id)
                 return Response(response, status=status.HTTP_200_OK)
             
             except AuthenticationFailed as e:

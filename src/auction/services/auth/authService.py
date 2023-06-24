@@ -47,7 +47,7 @@ class AuthService(IAuthService):
         except Exception as e:
             raise Exception(str(e))
         
-    def auth(self, userId):
+    def getSessionUserData(self, userId):
         try:
             user = User.objects.get(id=userId)
 

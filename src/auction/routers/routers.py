@@ -9,6 +9,7 @@ urlpatterns = [
     path('auth/login/', AuthController.login, name='login'),
     path('auth/register/', AuthController.register, name='register'),
     path('auth/logout/', AuthController.logout, name='logout'),
+    path('auth/getSessionUserData/', AuthController.getSessionUserData, name='getSessionUserData'),
 
     path('auction/create/', AuctionController.create, name='create'),
     path('auction/update/', AuctionController.update, name='update'),
