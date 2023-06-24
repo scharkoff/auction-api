@@ -10,9 +10,13 @@ class LotService(ILotService):
     def __init__(self) -> None:
         pass
     
-    def getAll(self):
+    def getAll(self, owner_id):
         try:
-            lots = Lot.objects.all()
+            
+            if owner_id is not None:
+                lots = Lot.objects.filter(owner_id=owner_id)
+            else:
+                lots = Lot.objects.all()
 
             serializedLots = LotSerializer(lots, many=True).data
 

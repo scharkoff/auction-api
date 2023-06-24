@@ -102,9 +102,14 @@ class AuctionService(IAuctionService):
         except Exception as e:
             raise Exception(str(e))
         
-    def getAll(self):
+    def getAll(self, owner_id):
         try:
-            auctions = Auction.objects.all()
+
+            if owner_id is not None:
+                auctions = Auction.objects.filter(owner_id=owner_id)
+            else:
+                auctions = Auction.objects.all()
+            
             serializedAuctions = AuctionSerializer(auctions, many=True).data
 
             return {'message': 'Аукцион(ы) успешно найден(ы)', 'data': serializedAuctions}

@@ -41,8 +41,10 @@ class LotController(ILotController):
     def getAll(request):
         try:
 
+            owner_id = request.query_params.get('owner_id', None)
+
             try:
-                response = LotController.lotService.getAll()
+                response = LotController.lotService.getAll(owner_id)
                 return Response(response, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

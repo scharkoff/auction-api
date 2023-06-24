@@ -9,9 +9,13 @@ from django.db import transaction
 from .bidServiceInterface import IBidService
 
 class BidService(IBidService):
-    def getAll(self):
+    def getAll(self, owner_id):
         try:
-            bids = Bid.objects.all()
+          
+            if owner_id is not None:
+                bids = Bid.objects.filter(owner_id=owner_id)
+            else:
+                bids = Bid.objects.all()
 
             serializedBids = BidSerializer(bids, many=True).data
 
