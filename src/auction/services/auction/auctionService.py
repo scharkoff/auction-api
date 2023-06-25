@@ -148,11 +148,11 @@ class AuctionService(IAuctionService):
         
     def delete(self, auctionId):
         try:
-            auction = Auction.objects.get(id=auctionId)
+            auction = Auction.objects.get(id=int(auctionId))
 
             auction.delete()
 
-            return {'message': 'Аукцион успешно удален'}
+            return {'data': {'id': int(auctionId)},'message': 'Аукцион успешно удален'}
         except Auction.DoesNotExist:
             raise ObjectDoesNotExist('Запрашиваемый аукцион не найден или не существует')
         except Exception as e:
