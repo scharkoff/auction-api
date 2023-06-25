@@ -109,7 +109,7 @@ class AuctionService(IAuctionService):
 
             auctions = Auction.objects.all()
 
-            if ownerId is not None and ownerId != 0:
+            if ownerId is not None and ownerId != '0':
                 auctions = auctions.filter(owner_id=ownerId)
 
             if sort == 'asc':

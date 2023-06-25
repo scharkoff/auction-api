@@ -12,7 +12,7 @@ class AuctionSerializer(serializers.ModelSerializer):
 
     def get_owner(self, obj):
         owner_id = obj.owner_id_id
-        print(owner_id)
+
         try:
             user = User.objects.get(id=owner_id)
 

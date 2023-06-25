@@ -13,15 +13,14 @@ class LotService(ILotService):
     def getAll(self, ownerId, auctionId):
         try:
 
-            ownerId = int(ownerId)
-            auctionId = int(auctionId)
-
             lots = Lot.objects.all()
 
-            if ownerId is not None and ownerId != 0:
+            if ownerId is not None and ownerId != '0':
+                print(ownerId)
                 lots = lots.filter(owner_id=ownerId)
 
-            if auctionId is not None and auctionId != 0:
+            if auctionId is not None and auctionId != '0':
+                print(auctionId)
                 lots = lots.filter(auction_id=auctionId)
 
             serializedLots = LotSerializer(lots, many=True).data
