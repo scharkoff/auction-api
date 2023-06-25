@@ -1,12 +1,26 @@
 from rest_framework import serializers
 from auction.models.auction import Auction
+from django.contrib.auth.models import User
+from auction.serializers.user import UserSerializer
 
 class AuctionSerializer(serializers.ModelSerializer):
-    created = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S.%fZ')
+    owner = serializers.SerializerMethodField()
 
     class Meta:
         model = Auction
-        fields = ['id', 'title', 'description', 'start_time', 'end_time', 'created', 'is_closed', 'owner_id']
+        fields = ['id', 'title', 'description', 'start_time', 'end_time', 'created', 'is_closed', 'owner_id', 'owner']
+
+    def get_owner(self, obj):
+        owner_id = obj.owner_id_id
+        print(owner_id)
+        try:
+            user = User.objects.get(id=owner_id)
+
+            serializedUser = UserSerializer(user).data
+
+            return serializedUser
+        except User.DoesNotExist:
+            return None
 
     def validate(self, data):
         start_time = data.get('start_time')
