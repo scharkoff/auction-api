@@ -2,9 +2,11 @@ from rest_framework import serializers
 from auction.models.auction import Auction
 
 class AuctionSerializer(serializers.ModelSerializer):
+    created = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S.%fZ')
+
     class Meta:
         model = Auction
-        fields = ['id', 'title', 'description', 'start_time', 'end_time', 'is_closed', 'owner_id']
+        fields = ['id', 'title', 'description', 'start_time', 'end_time', 'created', 'is_closed', 'owner_id']
 
     def validate(self, data):
         start_time = data.get('start_time')

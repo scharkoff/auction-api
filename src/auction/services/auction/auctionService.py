@@ -5,6 +5,7 @@ from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from django.db import transaction
+from django.utils import timezone
 
 class AuctionService(IAuctionService):
     def __init__(self) -> None:
@@ -103,13 +104,23 @@ class AuctionService(IAuctionService):
         except Exception as e:
             raise Exception(str(e))
         
-    def getAll(self, ownerId):
+    def getAll(self, ownerId, sort, filter):
         try:
 
+            auctions = Auction.objects.all()
+
             if ownerId is not None and ownerId != 0:
-                auctions = Auction.objects.filter(owner_id=ownerId)
-            else:
-                auctions = Auction.objects.all()
+                auctions = auctions.filter(owner_id=ownerId)
+
+            if sort == 'asc':
+                auctions = auctions.order_by('created')
+            elif sort == 'desc':
+                auctions = auctions.order_by('-created') 
+
+            if filter == 'closed':
+                auctions = auctions.filter(is_closed=True) 
+            elif filter == 'active':
+                auctions = auctions.filter(is_closed=False) 
             
             serializedAuctions = AuctionSerializer(auctions, many=True).data
 

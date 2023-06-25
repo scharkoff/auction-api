@@ -126,9 +126,11 @@ class AuctionController(IAuctionController):
         try:
 
             ownerId = request.query_params.get('owner_id', None)
+            sort = request.query_params.get('sort', '')
+            filter = request.query_params.get('filter', '')
 
             try:
-                response = AuctionController.auctionService.getAll(ownerId)
+                response = AuctionController.auctionService.getAll(ownerId, sort, filter)
                 return Response(response, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
