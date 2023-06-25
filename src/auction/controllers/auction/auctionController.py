@@ -162,7 +162,7 @@ class AuctionController(IAuctionController):
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
-            auctionId = request.data.get('auctionId')
+            auctionId = request.query_params.get('id', None)
 
             if not auctionId:
                 raise Exception("Неправильный формат запроса")

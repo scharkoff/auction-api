@@ -1,11 +1,42 @@
 from rest_framework import serializers
 from auction.models.lot import Lot
+from django.contrib.auth.models import User
+from auction.models.auction import Auction
+from auction.serializers.user import UserSerializer
+from auction.serializers.auction import AuctionSerializer
 
 class LotSerializer(serializers.ModelSerializer):
+    owner = serializers.SerializerMethodField()
+    auction = serializers.SerializerMethodField()
+
     class Meta:
         model = Lot
-        fields = ['id', 'title', 'description', 'start_time', 'end_time', 'owner_id', 'auction_id', 'winner_id','image']
+        fields = ['id', 'title', 'description', 'start_time', 'end_time', 'owner_id', 'owner', 'auction_id', 'auction', 'winner_id','image']
 
+    def get_auction(self, obj):
+        auction_id = obj.auction_id_id
+
+        try:
+            auction = Auction.objects.get(id=auction_id)
+
+            serializedAuction = AuctionSerializer(auction).data
+
+            return serializedAuction
+        except Auction.DoesNotExist:
+            return None
+        
+    def get_owner(self, obj):
+        owner_id = obj.owner_id_id
+
+        try:
+            user = User.objects.get(id=owner_id)
+
+            serializedUser = UserSerializer(user).data
+
+            return serializedUser
+        except User.DoesNotExist:
+            return None
+        
     def validate(self, data):
         start_time = data.get('start_time')
         end_time = data.get('end_time')
