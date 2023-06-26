@@ -124,7 +124,7 @@ class UsersController(IUsersController):
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
-            userId = request.data.get('userId')
+            userId = request.query_params.get('id', None)
 
             user = User.objects.get(id=userId)
             if user.id != request.user.id and not request.user.is_superuser:
