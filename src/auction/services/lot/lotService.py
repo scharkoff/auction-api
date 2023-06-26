@@ -123,7 +123,7 @@ class LotService(ILotService):
 
             lot.delete()
 
-            return {'message': 'Лот успешно удален'}
+            return {'data': {'id': int(lotId)}, 'message': 'Лот успешно удален'}
         except Lot.DoesNotExist:
             raise ObjectDoesNotExist('Запрашиваемый лот не найден или не существует')
         except Exception as e:
