@@ -1,16 +1,33 @@
 from django.core.exceptions import ObjectDoesNotExist
 from auction.models.bid import Bid
+from auction.models.lot import Lot
 from auction.serializers.bid import BidSerializer
+from auction.serializers.lot import LotSerializer
 from rest_framework import serializers
 from django.db import transaction
 from .bidServiceInterface import IBidService
 
 class BidService(IBidService):
-    def getAll(self, owner_id):
+    def getUserBidByLotId(self, ownerId, lotId): 
+        try:
+
+            print(ownerId)
+             
+            bid = Bid.objects.get(owner_id=ownerId, lot_id=lotId)
+
+            serializedBid = BidSerializer(bid).data
+
+            return {'message': 'Ставка успешно найдена', 'data': serializedBid}
+        except Bid.DoesNotExist:
+            raise ObjectDoesNotExist('Запрашиваемая ставка не найдена или не существует')
+        except Exception as e:
+            raise Exception(str(e))
+        
+    def getAll(self, ownerId):
         try:
           
-            if owner_id is not None:
-                bids = Bid.objects.filter(owner_id=owner_id)
+            if ownerId is not None:
+                bids = Bid.objects.filter(owner_id=ownerId)
             else:
                 bids = Bid.objects.all()
 
@@ -59,12 +76,15 @@ class BidService(IBidService):
         try:
             with transaction.atomic():
               bid = Bid.objects.get(id=bidId)
-
               bid.price = price
-
               serializer = BidSerializer(instance=bid, data={"price": price}, partial=True)
-                
               serializer.is_valid(raise_exception=True)
+
+              lot = Lot.objects.get(id=bid.lot_id_id)
+              lotSerializer = LotSerializer(instance=lot, data={"price": price}, partial=True)
+              lotSerializer.is_valid(raise_exception=True)
+              lot.price = price
+              lot.save()
 
               bid = serializer.save()
 

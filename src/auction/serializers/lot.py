@@ -38,10 +38,23 @@ class LotSerializer(serializers.ModelSerializer):
             return None
         
     def validate(self, data):
+        price = data.get('price')
+        instance = self.instance
         start_time = data.get('start_time')
         end_time = data.get('end_time')
         title = data.get('title')
         description = data.get('description')
+
+        print("instance", instance)
+
+        if instance and price is not None:
+            current_price = instance.price
+
+            print("price", price)
+            print("current_price", current_price)
+
+            if current_price > 0 and price < current_price:
+                raise serializers.ValidationError("Ставка не может быть меньше текущей цены")
 
         if start_time and end_time:
             if start_time >= end_time:
@@ -52,5 +65,6 @@ class LotSerializer(serializers.ModelSerializer):
         
         if description and len(description) < 10:
             raise serializers.ValidationError("Описание должно иметь не менее 10-ти символов")
+        
         
         return data

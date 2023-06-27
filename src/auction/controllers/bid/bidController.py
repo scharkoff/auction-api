@@ -39,12 +39,28 @@ class BidController(IBidController):
 
     @staticmethod
     @api_view(['GET'])
-    def getAll(request):
+    def getUserBidByLotId(request):
         try:
-            owner_id = request.query_params.get('owner_id', None)
+            ownerId = request.user.id
+            lotId = request.query_params.get('lot_id', None)
 
             try:
-                response = BidController.bidService.getAll(owner_id)
+                response = BidController.bidService.getUserBidByLotId(ownerId, lotId)
+                return Response(response, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+        except Exception as e:
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    @staticmethod
+    @api_view(['GET'])
+    def getAll(request):
+        try:
+            ownerId = request.query_params.get('ownerId', None)
+
+            try:
+                response = BidController.bidService.getAll(ownerId)
                 return Response(response, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

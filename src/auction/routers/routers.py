@@ -36,4 +36,5 @@ urlpatterns = [
     path('bid/create/', BidController.create, name='create'),
     path('bid/update/', BidController.update, name='update'),
     path('bid/delete/', BidController.delete, name='delete'),
+    path('bid/getUserBidByLotId/', BidController.getUserBidByLotId, name='getUserBidByLotId'),
 ]

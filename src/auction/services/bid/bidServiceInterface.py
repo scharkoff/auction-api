@@ -20,3 +20,7 @@ class IBidService(ABC):
     @abstractmethod
     def getAll(self):
         pass
+
+    @abstractmethod
+    def getUserBidByLotId(request):
+        pass

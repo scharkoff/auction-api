@@ -20,3 +20,7 @@ class IBidController(ABC):
     @abstractmethod
     def getAll(request):
         pass
+
+    @abstractmethod
+    def getUserBidByLotId(request):
+        pass
