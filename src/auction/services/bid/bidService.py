@@ -2,9 +2,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from auction.models.bid import Bid
 from auction.serializers.bid import BidSerializer
 from rest_framework import serializers
-from django.contrib.auth.models import User
-from auction.models.lot import Lot
-from django.shortcuts import get_object_or_404
 from django.db import transaction
 from .bidServiceInterface import IBidService
 

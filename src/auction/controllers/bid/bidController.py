@@ -111,7 +111,7 @@ class BidController(IBidController):
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
-            bidId = request.data.get('bidId')
+            bidId = request.query_params.get('id', None)
 
             if not bidId:
                 raise Exception("Неправильный формат запроса")
