@@ -57,10 +57,10 @@ class BidController(IBidController):
     @api_view(['GET'])
     def getAll(request):
         try:
-            ownerId = request.query_params.get('ownerId', None)
+            lotId = request.query_params.get('lot_id', None)
 
             try:
-                response = BidController.bidService.getAll(ownerId)
+                response = BidController.bidService.getAll(lotId)
                 return Response(response, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

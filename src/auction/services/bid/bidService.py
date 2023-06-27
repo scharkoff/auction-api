@@ -23,13 +23,13 @@ class BidService(IBidService):
         except Exception as e:
             raise Exception(str(e))
         
-    def getAll(self, ownerId):
+    def getAll(self, lotId):
         try:
           
-            if ownerId is not None:
-                bids = Bid.objects.filter(owner_id=ownerId)
-            else:
-                bids = Bid.objects.all()
+            bids = Bid.objects.all()
+
+            if lotId is not None and lotId != '0':
+                bids = Bid.objects.filter(lot_id=lotId)
 
             serializedBids = BidSerializer(bids, many=True).data
 
