@@ -83,7 +83,7 @@ class LotController(ILotController):
             lotId = request.data.get('lotId')
 
             lot = Lot.objects.get(id=lotId)
-            if lot.owner_id != request.user.id and not request.user.is_superuser:
+            if lot.owner_id_id != request.user.id and not request.user.is_superuser:
                 return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
             
             startTime = request.data.get('startTime', None)
@@ -121,7 +121,7 @@ class LotController(ILotController):
                 raise Exception("Неправильный формат запроса") 
             
             lot = Lot.objects.get(id=lotId)
-            if lot.owner_id != request.user.id and not request.user.is_superuser:
+            if lot.owner_id_id != request.user.id and not request.user.is_superuser:
                 return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
 
             try:

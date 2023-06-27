@@ -99,7 +99,8 @@ class BidController(IBidController):
             bidId = request.data.get('bidId')
 
             bid = Bid.objects.get(id=bidId)
-            if bid.owner_id != request.user.id and not request.user.is_superuser:
+            print(vars(bid))
+            if bid.owner_id_id != request.user.id and not request.user.is_superuser:
                 return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
             
             price = request.data.get('price')
@@ -133,7 +134,7 @@ class BidController(IBidController):
                 raise Exception("Неправильный формат запроса")
 
             bid = Bid.objects.get(id=bidId)
-            if bid.owner_id != request.user.id and not request.user.is_superuser:
+            if bid.owner_id_id != request.user.id and not request.user.is_superuser:
                 return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
 
             try:

@@ -50,7 +50,7 @@ class AuctionController(IAuctionController):
             auctionId = request.data.get('auctionId')
 
             auction = Auction.objects.get(id=auctionId)
-            if auction.owner_id != request.user.id and not request.user.is_superuser:
+            if auction.owner_id_id != request.user.id and not request.user.is_superuser:
                 return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
 
             title = request.data.get('title', None)
@@ -83,7 +83,7 @@ class AuctionController(IAuctionController):
             auctionId = request.data.get('auctionId')
 
             auction = Auction.objects.get(id=auctionId)
-            if auction.owner_id != request.user.id and not request.user.is_superuser:
+            if auction.owner_id_id != request.user.id and not request.user.is_superuser:
                 return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
 
             if not auctionId:
@@ -168,7 +168,7 @@ class AuctionController(IAuctionController):
                 raise Exception("Неправильный формат запроса")
 
             auction = Auction.objects.get(id=auctionId)
-            if auction.owner_id != request.user.id and not request.user.is_superuser:
+            if auction.owner_id_id != request.user.id and not request.user.is_superuser:
                 return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
 
             try:

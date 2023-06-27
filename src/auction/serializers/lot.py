@@ -45,13 +45,8 @@ class LotSerializer(serializers.ModelSerializer):
         title = data.get('title')
         description = data.get('description')
 
-        print("instance", instance)
-
         if instance and price is not None:
             current_price = instance.price
-
-            print("price", price)
-            print("current_price", current_price)
 
             if current_price > 0 and price < current_price:
                 raise serializers.ValidationError("Ставка не может быть меньше текущей цены")
