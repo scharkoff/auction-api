@@ -30,6 +30,7 @@ urlpatterns = [
     path('lot/create/', LotController.create, name='create'),
     path('lot/update/', LotController.update, name='update'),
     path('lot/delete/', LotController.delete, name='delete'),
+    path('lot/finish/', LotController.finish, name='finish'),
 
     path('bid/getAll/', BidController.getAll, name='getAll'),
     path('bid/getById/', BidController.getById, name='getById'),

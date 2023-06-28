@@ -1,6 +1,10 @@
 from auction.serializers.lot import LotSerializer
+from auction.serializers.bid import BidSerializer
 from rest_framework import serializers
 from auction.models.lot import Lot
+from auction.models.bid import Bid
+from django.db.models import Max
+from django.contrib.auth.models import User
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
@@ -9,18 +13,45 @@ from .lotServiceInterface import ILotService
 class LotService(ILotService):
     def __init__(self) -> None:
         pass
+
+    def finish(self, lotId):
+        try:
+            with transaction.atomic():
+                maxBid = Bid.objects.filter(lot_id=int(lotId)).aggregate(Max('price'))
+                maxPrice = maxBid['price__max']
+
+                if maxPrice is not None:
+                    winningBid = Bid.objects.filter(lot_id=int(lotId), price=maxPrice).first()
+
+                    if winningBid is not None:
+                        winningLot = Lot.objects.get(id=int(lotId))
+                        winningLot.winner_id_id = winningBid.owner_id_id
+                        winningLot.save()
+
+                        serializer = LotSerializer(instance=winningLot, data={"winner_id": winningBid.owner_id_id}, partial=True)
+                        serializer.is_valid(raise_exception=True)
+
+                        serializedLot = serializer.data
+                        return  {'message': 'Победитель успешно определен', 'data': serializedLot}
+                    else:
+                        raise Exception('Не удалось найти победителя ставки')
+                else:
+                    raise Exception('Нет ставок для данного лота')
+        except Bid.DoesNotExist:
+            raise Exception('Нет ставок для данного лота')
+        except Exception as e:
+            print(e)
+            raise Exception(str(e))
+
     
     def getAll(self, ownerId, auctionId):
         try:
-
             lots = Lot.objects.all()
 
             if ownerId is not None and ownerId != '0':
-                print(ownerId)
                 lots = lots.filter(owner_id=ownerId)
 
             if auctionId is not None and auctionId != '0':
-                print(auctionId)
                 lots = lots.filter(auction_id=auctionId)
 
             serializedLots = LotSerializer(lots, many=True).data

@@ -8,11 +8,24 @@ from auction.serializers.auction import AuctionSerializer
 class LotSerializer(serializers.ModelSerializer):
     owner = serializers.SerializerMethodField()
     auction = serializers.SerializerMethodField()
+    winner = serializers.SerializerMethodField()
 
     class Meta:
         model = Lot
-        fields = ['id', 'title', 'description', 'price', 'start_time', 'end_time', 'owner_id', 'owner', 'auction_id', 'auction', 'winner_id','image']
+        fields = ['id', 'title', 'description', 'price', 'start_time', 'end_time', 'owner_id', 'owner', 'auction_id', 'auction', 'winner_id', 'winner', 'image']
 
+    def get_winner(self, obj):
+        winner_id = obj.winner_id_id
+
+        try:
+            winner = User.objects.get(id=winner_id)
+
+            serializedUser = UserSerializer(winner).data
+
+            return serializedUser
+        except User.DoesNotExist:
+            return None
+        
     def get_auction(self, obj):
         auction_id = obj.auction_id_id
 

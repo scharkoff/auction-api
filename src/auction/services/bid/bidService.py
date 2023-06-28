@@ -58,6 +58,12 @@ class BidService(IBidService):
                     "price": price
                 }
 
+                lot = Lot.objects.get(id=lotId)
+                lotSerializer = LotSerializer(instance=lot, data={"price": price}, partial=True)
+                lotSerializer.is_valid(raise_exception=True)
+                lot.price = price
+                lot.save()
+
                 serializer = BidSerializer(data=dataToValidate)
 
                 serializer.is_valid(raise_exception=True)

@@ -107,6 +107,33 @@ class LotController(ILotController):
 
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    @staticmethod
+    @api_view(['POST'])
+    def finish(request):
+        try:
+            if not request.user.is_authenticated or not request.user.is_active:
+                return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            lotId = request.query_params.get('id', None)
+
+            if not lotId:
+                raise Exception("Неправильный формат запроса") 
+            
+            lot = Lot.objects.get(id=lotId)
+            if lot.owner_id_id != request.user.id and not request.user.is_superuser:
+                return Response({'message': 'Недостаточно прав для выполнения операции'}, status=status.HTTP_403_FORBIDDEN)
+
+            try:
+                response = LotController.lotService.finish(lotId)
+                return Response(response, status=status.HTTP_200_OK)
+            except ObjectDoesNotExist as e:
+                return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except Exception as e:
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @staticmethod
     @api_view(['DELETE'])
