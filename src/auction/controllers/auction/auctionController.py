@@ -80,7 +80,7 @@ class AuctionController(IAuctionController):
             if not request.user.is_authenticated or not request.user.is_active:
                 return Response({'message': 'Ошибка авторизации'}, status=status.HTTP_401_UNAUTHORIZED)
             
-            auctionId = request.data.get('auctionId')
+            auctionId = request.query_params.get('id', None)
 
             auction = Auction.objects.get(id=auctionId)
             if auction.owner_id_id != request.user.id and not request.user.is_superuser:
