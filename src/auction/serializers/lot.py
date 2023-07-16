@@ -66,7 +66,7 @@ class LotSerializer(serializers.ModelSerializer):
 
         if start_time and end_time:
             if start_time >= end_time:
-                raise serializers.ValidationError("Время начала должно быть меньше, чем время окончания аукциона")
+                raise serializers.ValidationError("Время начала должно быть меньше, чем время окончания")
             
         if title and len(title) < 3:
             raise serializers.ValidationError("Название должно иметь не менее 3-х символов")
