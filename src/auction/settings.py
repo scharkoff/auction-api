@@ -91,8 +91,6 @@ CSRF_TRUSTED_ORIGINS = [os.getenv('ORIGIN_URL')]
 CORS_ALLOWED_ORIGINS = [os.getenv('CORS_ALLOWED_URL', '*')]
 CORS_ALLOW_CREDENTIALS = True
 
-TIME_ZONE = 'Europe/Moscow'
-
 WSGI_APPLICATION = 'auction.wsgi.application'
 
 # Database
@@ -125,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
