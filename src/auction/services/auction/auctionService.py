@@ -92,6 +92,23 @@ class AuctionService(IAuctionService):
             raise ObjectDoesNotExist('Запрашиваемый аукцион не найден или не существует')
         except Exception as e:
             raise Exception(str(e))
+        
+    def checkStatus(self, auctionId):
+        try:
+            with transaction.atomic():
+                auction = Auction.objects.get(id=auctionId)
+            
+                if (auction.end_time <= timezone.now()):
+                    auction.is_closed = True
+                    auction.save()
+              
+                serializedAuction = AuctionSerializer(auction).data
+
+                return {'message': 'Обновленная информация об аукционе', 'data': serializedAuction}
+        except Auction.DoesNotExist:
+            raise ObjectDoesNotExist('Запрашиваемый аукцион не найден или не существует')
+        except Exception as e:
+            raise Exception(str(e))
 
     def getById(self, auctionId):
         try:
