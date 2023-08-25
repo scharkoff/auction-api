@@ -5,6 +5,7 @@ from auction.models.lot import Lot
 from auction.models.bid import Bid
 from django.db.models import Max
 from django.contrib.auth.models import User
+from django.utils import timezone
 from datetime import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
@@ -32,6 +33,7 @@ class LotService(ILotService):
                         serializer.is_valid(raise_exception=True)
 
                         serializedLot = serializer.data
+                        print(serializedLot)
                         return  {'message': 'Победитель успешно определен', 'data': serializedLot}
                     else:
                         raise Exception('Не удалось найти победителя ставки')
@@ -41,6 +43,26 @@ class LotService(ILotService):
             raise Exception('Нет ставок для данного лота')
         except Exception as e:
             print(e)
+            raise Exception(str(e))
+        
+    def checkStatus(self, lotId):
+        try:
+            self.finish(lotId)
+
+            with transaction.atomic():
+                lot = Lot.objects.get(id=lotId)
+
+            
+                if (lot.end_time <= timezone.now()):
+                    lot.is_closed = True
+                    lot.save()
+              
+                serializedLot = LotSerializer(lot).data
+
+                return {'message': 'Обновленная информация о лоте', 'data': serializedLot}
+        except Lot.DoesNotExist:
+            raise ObjectDoesNotExist('Запрашиваемый лот не найден или не существует')
+        except Exception as e:
             raise Exception(str(e))
 
     

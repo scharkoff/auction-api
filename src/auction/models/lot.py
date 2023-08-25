@@ -12,3 +12,4 @@ class Lot(models.Model):
     end_time = models.DateTimeField()
     image = models.CharField(max_length=255, default=None, null=True)
     price = models.BigIntegerField(default=0)
+    is_closed = models.BooleanField(default=False)

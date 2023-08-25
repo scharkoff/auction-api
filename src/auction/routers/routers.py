@@ -32,6 +32,7 @@ urlpatterns = [
     path('lot/update/', LotController.update, name='update'),
     path('lot/delete/', LotController.delete, name='delete'),
     path('lot/finish/', LotController.finish, name='finish'),
+    path('lot/checkStatus/', LotController.checkStatus, name='checkStatus'),
 
     path('bid/getAll/', BidController.getAll, name='getAll'),
     path('bid/getById/', BidController.getById, name='getById'),

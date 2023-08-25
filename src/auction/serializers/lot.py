@@ -12,7 +12,7 @@ class LotSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lot
-        fields = ['id', 'title', 'description', 'price', 'start_time', 'end_time', 'owner_id', 'owner', 'auction_id', 'auction', 'winner_id', 'winner', 'image']
+        fields = ['id', 'title', 'description', 'price', 'start_time', 'end_time', 'is_closed', 'owner_id', 'owner', 'auction_id', 'auction', 'winner_id', 'winner', 'image']
 
     def get_winner(self, obj):
         winner_id = obj.winner_id_id

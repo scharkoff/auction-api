@@ -134,6 +134,26 @@ class LotController(ILotController):
 
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    @staticmethod
+    @api_view(['GET'])
+    def checkStatus(request):
+        try: 
+            lotId = request.query_params.get('id', None)
+
+            if not lotId:
+                raise Exception("Неправильный формат запроса")
+
+            try:
+                response = LotController.lotService.checkStatus(lotId)
+                return Response(response, status=status.HTTP_200_OK)
+            except ObjectDoesNotExist as e:
+                return Response({'message': str(e)}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except Exception as e:
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @staticmethod
     @api_view(['DELETE'])
